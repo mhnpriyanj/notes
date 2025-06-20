@@ -1,0 +1,252 @@
+				Date : 13-09-2021
+				Spring Boot 9AM 
+				   Mr. RAGHU
+		------------------------------------------------
+		       Association Mapping + Joins
+
+Database :
+  Link one table(Primary Key) with another table(Foreign Key) using PK-FK Columns.
+
+Multiplicity (4)
+ one to one       1...1
+ one to many      1...*
+ many to one      *...1
+ many to many     *...*
+
+           1...1
+ employee ------ passport 
+
+	  1...*
+ employee ------ address
+
+          1...*
+ product ------- brand
+
+         1...*
+ vendor ------- contract
+
+	   *...1
+ employee ------ department
+
+	  *...*
+ student ------ course
+
+
+Hint: *(Many) Side FK Column is created.
+
+Note:
+1. For one-to-many and many-to-one FK column is created at many side.
+2. For many-to-many one additional table is created.
+   With 2 Fk columns
+3. For one-to-one , we choose *...1 and many side UNIQUE condition is applied.
+
+       1...1
+person  --- aadhar
+
+     *...*
+book ---- author
+
+       *...*
+Faculty --- Course
+
+       1...*
+Student --- Contact
+
+       1...*
+College --- Branch 
+
+--------------------------------------------------------------------------
+	Non-Collection                   Collection
+--------------------------------------------------------------------------
+         1...1                           1...*
+	 *...1                           *...*
+
+
+---Steps-----------------------------------------------------------------------
+S#1 Define two classes and apply HAS-A Relation (create HAS-A Variable)
+
+S#2 Check for Non-Collection  | Collection  Type.  
+   If collection type then change HAS-A variable to collection type.
+
+S#3 Apply Association Mapping annotation over HAS-A Variable.
+
+1...1 | @ManyToOne (unique condition)
+*...1 | @ManyToOne
+1...* | @OneToMany
+*...* | @ManyToMany
+
+S#4 Provide Join Column (or) Join table at HAS-A Variable
+S#5 Draw tables with column details..
+
+Q) Why can't we use @OneToOne for 1...1, why do we go for @ManyToOne?
+A) 
+========================================================================
+Name : SpringBoot2DataJpaManyToOne
+Dep  : Lombok, Data jpa, MySQL
+
+1. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+
+2. Entity classes
+
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="projtab")
+public class Project {
+	@Id
+	@Column(name="pid")
+	private Integer projId;
+	
+	@Column(name="pname")
+	private String projName;
+	
+	@Column(name="pclient")
+	private String projClient;
+	
+	@Column(name="pversion")
+	private Double projVersion;
+	
+}
+---------------
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="emptab")
+public class Employee {
+	@Id
+	@Column(name="eid")
+	private Integer empId;
+	
+	@Column(name="ename")
+	private String empName;
+	
+	@Column(name="edept")
+	private String empDept;
+	
+	@ManyToOne
+	@JoinColumn(name="pidFk")
+	private Project pob;//HAS-A
+}
+
+3. Repository interface
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Project;
+
+public interface ProjectRepository extends JpaRepository<Project, Integer>
+{
+
+}
+-----------
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Employee;
+
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+
+}
+
+4. Runner class
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Employee;
+import in.nareshit.raghu.entity.Project;
+import in.nareshit.raghu.repo.EmployeeRepository;
+import in.nareshit.raghu.repo.ProjectRepository;
+
+@Component
+public class TestInsertRunner implements CommandLineRunner {
+	
+	@Autowired
+	private ProjectRepository prepo;
+	
+	@Autowired
+	private EmployeeRepository erepo;
+
+	public void run(String... args) throws Exception {
+
+		// many rows in Employee table are connected with 1 row in project table
+				
+		Project p1 = new Project(110, "P-HTC", "NMO", 3.2);
+		Project p2 = new Project(112, "P-ORC", "NIT", 1.0);
+		
+		prepo.save(p1);
+		prepo.save(p2);
+		
+		Employee e1 = new Employee(50, "AA", "DEV", p1);
+		Employee e2 = new Employee(51, "BA", "DEV", p1);
+		Employee e3 = new Employee(52, "CA", "QA", p1);
+		
+		Employee e4 = new Employee(53, "NN", "DEV", p2);
+		Employee e5 = new Employee(54, "RR", "QA", p2);
+		
+		erepo.save(e1);
+		erepo.save(e2);
+		erepo.save(e3);
+		erepo.save(e4);
+		erepo.save(e5);
+		
+	}
+
+}
+===========================================================================
+  IS-A, HAS-A
+
+ Employee IS-A Person
+ Car HAS-A Engine
+ Student HAS-A Address
+----------------------------------
+Order of Coding : M1, M2
+  M2 using M1 internally.
+   or
+  M2 depends on M1
+
+in that case: M2 HAS-A M1
+ 
+
+

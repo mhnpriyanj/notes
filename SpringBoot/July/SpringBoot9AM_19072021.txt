@@ -1,0 +1,86 @@
+				Date : 19-Jul-21
+				Spring Boot 9AM
+				   Mr. RAGHU
+		--------------------------------------------------
+		  https://www.facebook.com/groups/thejavatemple
+			     javabyraghu@gmail.com
+
+Admin: 
+Srikanth Sir : +91-630 296 8665
+			
+Maven:
+https://www.youtube.com/watch?v=9eJAvApRAI0
+https://www.youtube.com/watch?v=jOykBjSl1X0
+https://www.youtube.com/watch?v=iLwuhbnFPqo
+
+Gradle:
+https://www.youtube.com/watch?v=xQQ982rgP9c
+
+
+*) Spring Boot :-
+          It is a Spring Based Framework that reduces Configuration
+	  to develop Applications.
+
+-> We develop standalone, web and distributed application.
+->** Every Spring Boot application/project created by Programmer internally
+      connected with Spring Boot Parent Project.
+
+-> This Parent Project reduces/provides
+  Common classes, configuration, jars, setup and runtime.
+
+*) note:
+a. Spring boot is not supporting XML Configuration (removed)
+   We use Annotation and Java Configuration.	
+
+-> XML is very slow in execution, more in error rate, additional
+    processors (SAX,DOM parsers required).
+
+b. Spring Boot supports two standard Build Tools
+   -> Maven 
+   -> Gradle
+
+c. Spring Boot supports Embedded Databases (H2/HSQL/Derby/Mongo)
+    [Embedded - No Download + No Install , just use them]
+  
+   These are called as InMemory Databases (Runs in RAM)
+   Used only in Development and test env only.
+
+d. Spring Boot supports Embedded servers ( **Tomcat/Jetty/Undertow )
+
+  Java ---> .jar/.war/.ear    [.ear not exist in spring boot]
+
+  .jar - Java Archive  -- Standalone app
+      
+   .java ---> .class --> .jar
+
+  .war ---> Web archive  (.class + .html + .css + .js) --Webservers
+
+  .ear ---> J2EE(EJB-Enterprise Java Bean) -- Enterprise Servers
+    
+**** Embedded servers can be used at Production environment.
+    Even you can deploy .war file at any external server.
+
+e. Tools : Logging(SLF4J), Unit Test(JUnit with Mock), Code Repository(Git)
+             Build Jenkins(Maven/Gradle), Containerization(Docker + Kubernetes)
+             Cloud Deployment (Heroku, PCF), ELK, Sleuth and Zipkin.
+
+
+f. Spring Boot - Microservices Design patterns
+
+g. Every Spring Boot application is created using Spring Initializer
+   'https://start.spring.io/'
+---------------------------------------------------------------------------
+
+https://www.youtube.com/watch?v=EA43S5R8LSc&list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr
+https://www.youtube.com/watch?v=ynxeJ8nP_HM&list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr&index=2
+
+9AM to 10:30AM -- doubts 10:30 AM to 11AM
+Duration 4 months
+Fresher to 8+
+
+Core java and Adv Java (JDBC/Servlets)
+
+*** NO recording sessions given
+
+--> imp recordings i'll provide -- security, mini projects, tools...
+  

@@ -1,0 +1,486 @@
+				Date : 17-Aug-21
+				Spring Boot 9AM
+				 Mr. RAGHU
+		------------------------------------------------
+			Sending Email
+
+*) Sending Mail as Text (or) HTML:-
+> Here setText() is overloaded
+> setText(text) internally calling setText(text,false)
+> setText(String , boolean) is the actual method contains logic to set data.
+
+ if boolean html=false, Text data is sent as Plain Text.
+            html=true , Text data is sent as HTML Content.
+
+
+---MyMailService-------------
+old code:
+  helper.setText(text);
+
+new code:
+  helper.setText(text,true);
+
+--Runner class-----------
+Old:
+  "HELLO USER " + new Date(), //text
+New:
+  "<html><body> <h1>Hello User </h1> <b>Welcome</b> <u>Bye</u> </body></html>",
+=====================================================================
+*) Working with Multiple Attachments:-
+
+> Resource(I) : it indicates a file exist in a location.
+
+A File exist in your System (D:/abcd folder ex)
+> FileSystemResource()
+A File Exist in internet location
+> UrlResource()
+A File Exist in Project src/main/resources folder
+> ClassPathResource()
+
+> Use Resource Parameter as Array 
+
+Old Code:
+  Resource file
+
+  MimeMessageHelper helper = 
+        new MimeMessageHelper(message,file!=null);
+
+  if(file!=null) {
+	helper.addAttachment(file.getFilename(), file);
+  }
+
+new Code:
+ Resource[] files
+
+ MimeMessageHelper helper = new MimeMessageHelper(message, 
+					files!=null && files.length>0);
+
+  if(files!=null && files.length>0) {
+     for(Resource file:files)
+ 	  helper.addAttachment(file.getFilename(), file);
+  }
+===================================================================
+			*** Overloading ****
+
+> using same method name and but different in paremeters.
+> send() method is overloaded as
+  a. to,subject,text
+  b. to,subject,text,file
+  c. to,subject,text,cc,bcc,files
+
+  
+===================Code==================================================
+1. Name : SpringBoot2EmailEx
+   Dep  : Java Mail Sender
+
+2. application.properties
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+#spring.mail.username=raghutest2022sr@gmail.com
+spring.mail.username=javaraghu2021@gmail.com
+#spring.mail.password=sr2021rs
+spring.mail.password=Raghu123.
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+3. MyMailService
+package in.nareshit.raghu.service;
+
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyMailService {
+	
+	@Autowired
+	private JavaMailSender sender;
+	
+	/**
+	 * Simple Email Method
+	 */
+	public boolean send(
+			String to,
+			String subject,
+			String text) 
+	{
+		return send(to, null, null, subject, text, null);
+	}
+	/**
+	 * Email  + 1 attachment
+	 */
+	public boolean send(
+			String to,
+			String subject,
+			String text,
+			Resource file
+			) 
+	{
+		return send(to, null, null, subject, text, new Resource[] {file});
+	}
+	/**
+	 * Email with all inputs
+	 */
+
+	public boolean send(
+			String to,
+			String[] cc,
+			String[] bcc,
+			String subject,
+			String text,
+			Resource[] files) 
+	{
+		
+		boolean sent = false;
+		
+		try {
+			//1. create one Message (MIME-Message)
+			MimeMessage message = sender.createMimeMessage();
+			
+			//2. Use Helper class to set data to MimeMessage
+			// [message, is Attachment exist]2 inputs
+			MimeMessageHelper helper = new MimeMessageHelper(message, 
+					files!=null && files.length>0);
+			
+			helper.setTo(to);
+			
+			if(cc!=null && cc.length>0)
+				helper.setCc(cc);
+			
+			if(bcc!=null && bcc.length>0) 
+				helper.setBcc(bcc);
+			
+			helper.setSubject(subject);
+			//helper.setText(text); //text,false
+			helper.setText(text,true); //sent data as HTML
+			
+			if(files!=null && files.length>0) {
+				//file name, data
+				for(Resource file:files)
+					helper.addAttachment(file.getFilename(), file);
+			}
+			
+			//3. send email
+			sender.send(message);
+			
+			sent = true;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			sent = false;
+		}
+		
+		return sent;
+	}
+}
+
+
+4. Runner#1
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
+import in.nareshit.raghu.service.MyMailService;
+
+//@Component
+public class TestEmailRunner implements CommandLineRunner {
+
+	@Autowired
+	private MyMailService service;
+
+	public void run(String... args) throws Exception {
+
+		Resource file1 = new FileSystemResource("D:/Images/kola.jpg");
+		Resource file2 = new FileSystemResource("D:/Images/SB630PM_16082021.png");
+		Resource file3 = new FileSystemResource("D:/Notes/SB615AM_09082021.txt");
+		Resource file4 = new UrlResource("https://image3.mouthshut.com/images/imagesp/925727702s.png");
+		Resource file5 = new ClassPathResource("hellodata.txt");
+
+		boolean sent =
+				service.send(
+						//"raghutest2022sr@gmail.com", //to
+						"javaraghu2021@gmail.com",
+						new String[] { //cc
+								"pramodkvish24@gmail.com",
+								"smartenoughere@gmail.com",
+								"saitejahst@gmail.com",
+								"mdsameer09@gmail.com",
+								"venukathem@gmail.com"
+
+						}, 
+						new String[] { //bcc
+								"naveenr081452@gmail.com",
+								"vickydeshwali74@gmail.com",
+								"ravigalla333@gmail.com",
+								"rupjyotideka1609@gmail.com"
+
+						}, 
+						"WELCOME TO ALL BOOT STUDENTS!", //subject
+						//"HELLO USER " + new Date(), //text
+						"<html><body> <h1>Hello User </h1> <b>Welcome</b> <u>Bye</u> </body></html>",
+						new Resource[] {
+								file1,file2,file3,file4,file5 //attachment
+						}
+						);
+
+		if(sent) {
+			System.out.println("SENT! CHECK INBOX!!");
+		} else {
+			System.out.println("SENDING FAILED!!!");
+		}
+	}
+
+}
+
+5. Runner#2
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.service.MyMailService;
+
+@Component
+public class TestEmailNewRunner implements CommandLineRunner {
+
+	@Autowired
+	private MyMailService mailService;
+	
+	public void run(String... args) throws Exception {
+		Resource file1 = new FileSystemResource("D:/Images/kola.jpg");
+		//boolean sent = mailService.send("javaraghu2021@gmail.com", "WELCOME", "HELLO");
+		boolean sent = mailService.send("javaraghu2021@gmail.com", "WELCOME", "HELLO",file1);
+		System.out.println(sent);
+	}
+
+}
+=============================================================================
+Q) What is builder design pattern?
+A)
+
+Q) Why Builder is better in creating lengthy object comapred
+  to normal new keyword and set methods?
+A)
+
+Sample s1 = new Sample();
+s1.setA(10);
+s1.setB(20);
+s1.setC(30);
+
+Sample.builder().a(10).b(20).c(30).build();
+
+*) Lombok generates method for builder using @Builder
+https://projectlombok.org/features/Builder
+
+@Builder
+class Sample {
+   sid;
+   sname;
+}
+
+class Sample  {
+   sid;
+   sname;
+    SampleBuilder builder();
+  static class SampleBuilder {
+    Sample build();
+    sid() { sid=---}
+    sname(){sname=___}
+  }
+}
+Sample.builder().sid().sname().build();
+==================================================================
+		Email code using MailBean
+
+a. MailBean class
+package in.nareshit.raghu.model;
+
+import org.springframework.core.io.Resource;
+
+import lombok.Data;
+
+//@Builder
+@Data
+//@Getter
+public class MailBean {
+
+	private String to;
+	private String[] cc;
+	private String[] bcc;
+	private String subject;
+	private String text;
+	private Resource[] files;
+}
+
+b. MailUtil
+package in.nareshit.raghu.util;
+
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.model.MailBean;
+
+@Component
+public class MailUtil {
+	
+	@Autowired
+	private JavaMailSender sender;
+
+	public boolean send(MailBean mb) 
+	{
+		
+		boolean sent = false;
+		
+		try {
+			//1. create one Message (MIME-Message)
+			MimeMessage message = sender.createMimeMessage();
+			
+			//2. Use Helper class to set data to MimeMessage
+			// [message, is Attachment exist]2 inputs
+			MimeMessageHelper helper = new MimeMessageHelper(message, 
+					mb.getFiles()!=null && mb.getFiles().length>0);
+			
+			helper.setTo(mb.getTo());
+			
+			if(mb.getCc()!=null && mb.getCc().length>0)
+				helper.setCc(mb.getCc());
+			
+			if(mb.getBcc()!=null && mb.getBcc().length>0) 
+				helper.setBcc(mb.getBcc());
+			
+			helper.setSubject(mb.getSubject());
+			//helper.setText(text); //text,false
+			helper.setText(mb.getText(),true); //sent data as HTML
+			
+			if(mb.getFiles()!=null && mb.getFiles().length>0) {
+				//file name, data
+				for(Resource file:mb.getFiles())
+					helper.addAttachment(file.getFilename(), file);
+			}
+			
+			//3. send email
+			sender.send(message);
+			
+			sent = true;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			sent = false;
+		}
+		
+		return sent;
+	}
+}
+
+c. Runner class
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.model.MailBean;
+import in.nareshit.raghu.util.MailUtil;
+
+@Component
+public class TestEmailMbRunner implements CommandLineRunner {
+
+	@Autowired
+	private MailUtil util;
+	
+	public void run(String... args) throws Exception {
+
+		Resource file3 = new FileSystemResource("D:/Notes/SB615AM_09082021.txt");
+		Resource file4 = new UrlResource("https://image3.mouthshut.com/images/imagesp/925727702s.png");
+		Resource file5 = new ClassPathResource("hellodata.txt");
+		/*
+		MailBean mb = MailBean.builder()	
+				.to("javaraghu2021@gmail.com")
+				.cc(new String[] { //cc
+						"pramodkvish24@gmail.com",
+						"smartenoughere@gmail.com",
+						"saitejahst@gmail.com",
+						"mdsameer09@gmail.com",
+						"venukathem@gmail.com"
+
+				})
+				.bcc(new String[] { //bcc
+						"naveenr081452@gmail.com",
+						"vickydeshwali74@gmail.com",
+						"ravigalla333@gmail.com",
+						"rupjyotideka1609@gmail.com"
+
+				})
+				.subject("WELCOME TO ALL BOOT STUDENTS!")
+				.text("<html><body> <h1>Hello User </h1> <b>Welcome</b> <u>Bye</u> </body></html>")
+				.files(new Resource[] {file3,file4,file5})
+				.build();
+		 */
+		//--------------------------------------
+		MailBean mb = new MailBean();
+		mb.setTo("javaraghu2021@gmail.com");
+		mb.setCc(new String[] { //cc
+				"pramodkvish05@gmail.com",
+				"smartenoughere@gmail.com",
+				"saitejahst@gmail.com",
+				"mdsameer09@gmail.com",
+				"venukathem@gmail.com"
+
+		});
+		mb.setBcc(new String[] { //bcc
+				"naveenr081452@gmail.com",
+				"vickydeshwali74@gmail.com",
+				"ravigalla333@gmail.com",
+				"rupjyotideka1609@gmail.com"
+
+		});
+		mb.setSubject("WELCOME TO ALL BOOT STUDENTS!");
+		mb.setText("<html><body> <h1>Hello User </h1> <b>Welcome</b> <u>Bye</u> </body></html>");
+		mb.setFiles(new Resource[] {file3,file4,file5});
+		
+		util.send(mb);
+
+	}
+
+}
+
+=======================================================================
+Must use business:-
+  https://workspace.google.com/intl/en_in/solutions/new-business/
+
+*) For Development mode we should use less-secure apps
+  (un-register apps/our code).
+  For Realtime code is same, but account details are business account.
+
+====================================================================
+Q) List<Student> ---> Excel Format?
+    Apache POI
+Q) List<Student> ---> Pdf Format?
+   iText PDF
+*) AdvJavaNitRaghuSirNareshIT # Page-97
+
+Notes Link:-
+https://www.mediafire.com/file/w5x9w5vcmkwkkdv/RaghuSirNareshITJavaPdfs.zip/file
+
+Free SMS Service:-
+https://ozekisms.com/p_2133-ozeki-quick-start-guide.html

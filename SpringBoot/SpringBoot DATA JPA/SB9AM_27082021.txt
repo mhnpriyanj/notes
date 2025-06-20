@@ -1,0 +1,185 @@
+				Date : 27-08-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+	--------------------------------------------------------------
+Debug:
+https://www.youtube.com/watch?v=HwwF4pvYWws
+
+			Spring Boot - Data JPA CrudRepository
+
+Name : SpringBoot2DataJpaMySQLCrud
+Dep  : Lombok, Data JPA, MySQL Driver
+
+a. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+
+--------------------------------------------
+b. Entity/Model 
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="booktab")
+public class Book {
+	@Id
+	@Column(name="bid")
+	private Integer bookId;
+	@Column(name="bname")
+	private String bookName;
+	@Column(name="bcost")
+	private Double bookCost;
+}
+
+
+----------------------------------------
+c. Repository Interface
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.repository.CrudRepository;
+import in.nareshit.raghu.entity.Book;
+
+public interface BookRepository extends CrudRepository<Book, Integer> {
+
+}
+
+-----------------------------------------------------------------
+d. Runner class
+
+package in.nareshit.raghu.runner;
+
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Book;
+import in.nareshit.raghu.repo.BookRepository;
+
+@Component
+public class BookTestRunner implements CommandLineRunner {
+
+	@Autowired
+	private BookRepository repo;
+	
+	public void run(String... args) throws Exception {
+		/*
+		 * Book b1 = new Book(101, "A", 200.0); repo.save(b1);
+		 */
+		/*repo.save(new Book(101, "A", 200.0)); //SELECT-> INSERT
+		repo.save(new Book(101, "B", 300.0)); //SELECT-> UPDATE*/
+		
+		/*repo.saveAll(
+				Arrays.asList(
+						new Book(101, "A", 200.0),
+						new Book(102, "B", 300.0),
+						new Book(103, "C", 400.0),
+						new Book(103, "E", 800.0),
+						new Book(104, "D", 500.0)
+						)
+				);*/
+		//Iterable<Book> itr = repo.findAll();
+		//print using iterator
+		/*Iterator<Book> it = itr.iterator();
+		while (it.hasNext()) {
+			Book book = it.next();
+			System.out.println(book);
+		}*/
+		
+		//JDK 1.5 forEach method
+		/*List<Book> list = (List<Book>) itr;
+		for(Book book:list) {
+			System.out.println(book);
+		}*/
+		
+		//Java 8 forEach using method Ref
+		//itr.forEach(System.out::println);
+		
+		//Java 8 forEach using lmabda exp
+		//itr.forEach(ob->System.out.println(ob));
+		
+		//Java 8 Stream
+		/*List<Book> list = (List<Book>) itr;
+		list
+		.stream()
+		.filter(ob->ob.getBookCost()>=300.0)
+		.sorted((ob1,ob2)->ob2.getBookName().compareTo(ob1.getBookName()))
+		.map(ob->"Book : "+ ob.getBookName()+" cost is => " + ob.getBookCost()+", having id=>"+ob.getBookId())
+		.forEach(System.out::println);*/
+		
+		/*System.out.println(repo.existsById(104));
+		System.out.println(repo.existsById(119));
+		*/
+		repo.findAllById(Arrays.asList(101,103,105,119,125))
+		.forEach(System.out::println);
+		
+		
+	}
+
+}
+
+
+
+*) @Repository we need to apply on Impl class in Spring f/w.
+   But in Spring Boot, programmer will define only interface,
+   Impl (PROXY) is generated. So, need not apply @Repository.
+   Even if you apply no error/exception (it is just like a indication)
+========================================================================
+save(obj):obj
+  This method is used to perform either INSERT or UPDATE based on PK value.
+
+=> First this method executes SELECT SQL with ID given.
+   If ID is not exist in DB or ID is null
+       then INSERT SQL GENERATED and EXECUTED
+   Else
+      Update SQL GENERATED and EXECUTED
+----------------------------------------------
+saveAll(Iterable<T> objs):Iterable<T> objs:
+
+=> Iterable is super type (added in JDK 1.5/ Java 5) for all collections
+
+=> We can either INSERT or UPDATE Multiple Entity class objects at a time.
+
+------------------------------------------
+findAll() : Iterable<T>
+
+  To fetch all rows from DB table : SQL - SELECT *FROM BOOK;
+
+
+existsById(id):boolean
+  This method is used to check is given id exist in DB or not?
+
+  if exist returns true, else returns false.
+
+
+--SQL in operator-----------------------
+select * from booktab where bid in (101,119,123,104);
+------------------------------------------
+findAllById(Iterable<ID> ids):Iterable<T>
+  This is used to fetch rows selected by users
+  internally uses in operator
+
+
+

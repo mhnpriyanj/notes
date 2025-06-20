@@ -1,0 +1,211 @@
+				Date : 23-Jul-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+	----------------------------------------------------------------
+				Properties file
+
+*) Spring Boot auto-loads pre-defined input file: application.properties
+*) Stores data in key=val.
+*) Here keys are : pre-defined key and programmer-defined keys.
+*) These files are used to provide application setup data.
+
+Ex: JDBC: driver, url, username and password.
+    ORM/Hibernate: dialect, show-sql, format-sql, ddlauto
+    Web App : server port, project name, tomcat version, ..etc
+    Email App : host, port, un, pwd.
+
+
+Link for Pre-defined keys:
+https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+
+----Spring F/w----------------------
+a. define properties file
+> Programmer has to create File with any name in Spring Project
+ex: 
+[project]
+  |-src/main/resources       [classpath]
+       |- abcd.properties
+
+b. Load properties file
+> Programmer should use annotation : @PropertiesSource
+
+ex:  @PropertiesSource("classpath:abcd.properties")
+
+c. provide key=vals
+--abcd.properties-------
+my.driver=OracleDriver
+my.url=jdbc-oracle
+my.un=system
+--------------------
+
+d. Read data from properties file
+
+@Value("${my.driver}")
+
+
+---Spring Boot----------------------
+a. Define properties file 
+
+> Spring Boot creates a file : 
+	application.properties
+
+b. Load properties file (by boot)
+
+> Spring Boot loads 'application.properties' by default.
+  No code is required by Programmer.
+
+c. keys are pre-defined/programmer defined, provide values
+
+> Programmer has to give this
+
+d. Read data from properties file
+
+> For our own keys we do code, but mostly we use pre-defined keys,
+    no need to write code.
+
+    @Value("${key}")
+
+---------Eclipse Keys-----------------------------------
+ctrl+shift+O          Imports
+ctrl+F11              Run main class
+ctrl+shift+T          Open pre-defined class/interface/enum/anntation
+ctrl+O                view all members of a class
+ctrl+L                Goto Line number
+---------------------------------------------------------
+
+==code===============================================
+a. create application
+> File > new > Spring Starter Project
+> Enter name and package
+
+Name : SpringBoot2PropertiesTestEx
+Package : in.nareshit.raghu
+
+> Next > Finish
+
+b. open application.properties file
+-------application.properties-----------
+#Comment Line
+#key symbols: dot(.) dash(-) and underscore(_)
+my.app.driver-class=OracleDriver
+my.app.url=jdbc-orcl
+my.app.un=system
+my.app.pwd=nit
+---------------------------------
+
+c. Define one class
+package in.nareshit.raghu;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyDbCon {
+	
+	@Value("${my.app.driver-class}")
+	private String driver;
+	
+	@Value("${my.app.url}")
+	private String url;
+	
+	@Value("${my.app.un}")
+	private String username;
+	
+	@Value("${my.app.pwd}")
+	private String password;
+
+	//source menu > generate toString > Generate
+	@Override
+	public String toString() {
+		return "MyDbCon [driver=" + driver + ", url=" + url + ", username=" + username + ", password=" + password + "]";
+	}
+
+	
+}
+
+
+d. Modified Main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2PropertiesTestExApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2PropertiesTestExApplication.class, args);
+		//reading object from container
+		Object ob = ac.getBean("myDbCon");
+		//print object data
+		System.out.println(ob);
+	}
+
+}
+====================================================================
+*) @Value("${key}")  must expects key at proeprties file.
+   It is (key) not optional. If not present spring boot will throw
+ 
+ IllegalArgumentException: Could not resolve placeholder 
+   'my.app.driver-class' in value "${my.app.driver-class}"
+
+*) If any key is repeated with different values(duplicate keys)
+  then Spring Boot override key-val, ie last combination is loaded.
+
+ex:
+  my.app.id=10
+  my.app.id=20
+  my.app.id=30
+
+  @Vaue("${my.app.id}") ---> 30
+
+*) keys are case-sensitive. 
+ie 
+  my.app.ID,  my.app.id  are different
+
+===FAQs==================================================================
+Q) What is key is not present when we read using @Value("${key}")?
+A) 
+
+Q) What if duplicate key is found in proeprties file?
+A)
+
+Q) What are symbols allowed to define a keyname in proeprties file?
+A) Dot(.) dash(-) and underscore(_) [No other symbols allowed]
+
+Q) Can we define and load our own proeprties files?
+A) 
+  Yes. But spring boot always gives Priority to application.properties file only
+  even you provide your own properties file.
+
+  There is no override concept like basePackage.
+  It is not used in realtime. It is not recomanded even.
+
+ *** But if key is not present in application.properties
+     then Container will read it from your properties.
+
+ Code Steps
+ #1 Right click on 'src/main/resources' folder > new > File
+	> enter name : abcd.properties > finish
+
+ #2 open abcd.properties add key=vals
+   my.app.driver-class=MY-LOCAL-DRIVER
+   my.app.url=jdbc-orcl-my-local
+
+  #3 At main class level: //loading file into containers
+      @PropertySource("classpath:abcd.properties")
+
+-----------------------------------------------------------------
+Q) Can we define our own multiple properties file ?
+A) YES. Not recomanded
+
+@PropertySource({
+	"classpath:abcd.properties", //1st loaded
+	"classpath:mno.properties", //2nd loaded
+})
+
+If duplicate keys are present in above(both)files
+then mno.properties overrides those values.
+
+----------------------------------------------------------------

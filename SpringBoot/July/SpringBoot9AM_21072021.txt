@@ -1,0 +1,117 @@
+				Date : 21-Jul-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+	------------------------------------------------------------------
+Day-1: https://youtu.be/JNBIWKzj-7Y
+Day-2: https://youtu.be/dytMX8WL_b8
+Day-3: https://youtu.be/J2Lnez6iWCc
+Day-4: https://youtu.be/53G-Ze8QuRM
+
+		Admin : Srikanth Sir | +91-6302968665
+	------------------------------------------------------------
+			  STS - Spring Tool Suite 
+
+=> Open Source Tool.
+=> Integrated with Eclipse
+=> Need not to go 'https://start.spring.io/' manually.
+
+S#1 Goto : https://spring.io/tools
+S#2 Click on OS based Link (Windows)
+Downloads as: 
+spring-tool-suite-4-4.11.0.RELEASE-e4.20.0-win32.win32.x86_64.self-extracting.jar
+
+S#3 Shows warning as : This type of file may harm your computer.
+       > Click on Keep > Keep anyway
+
+S#4 Just double click to extract
+  (wait for few minutes)
+S#5 Open Folder : C:\Downloads\sts-4.11.0.RELEASE
+   and click on "SpringToolSuite4 "
+
+S#6 Enter folder name : ex: D:\SpringBoot_9AM_JULY_2021
+       Click on launch
+
+S#7 (JDK Setup onetime)
+> Window > Preferences > Search with 'installed' > Installed JRE
+> Click on JRE Default > Remove > Click on Add > Standard VM
+> Next > Click on Directory > select location
+   ex: C:\Program Files\Java\jdk-11.0.11 
+
+S#8 Font : > Window > Preferences > Search with 'Font'
+                Basic > Text Font
+----------------------------------------------------------
+ctr  + / ctrl -  (Font Adjust)
+==========================================================
+		Creating Project
+
+S#1 File > new > Spring Starter Project > Enter details
+ 
+ Name    : SpringBoot2FirstExample
+ Package : in.nareshit.raghu
+
+> Next > Next > Finish
+
+S#2 create one class under src/main/java folder
+
+> Right click on package name > new > class
+> Enter name : DbConn
+> Finish
+
+package in.nareshit.raghu;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+//ctrl+shift+O (imports)
+
+@Component
+public class DbConn {
+
+	@Value("${my.driver}")
+	private String driver;
+
+	@Value("${my.url}")
+	private String url;
+
+	// Source Menu > Generate toString > Generate
+	public String toString() {
+		return "DbConn [driver=" + driver + ", url=" + url + "]";
+	}
+
+}
+
+S#3 application.properties
+#Comment line
+#key=val
+my.driver=OracleDriver
+my.url=jdbc-oracle
+
+S#4 In main class use Spring Container getBean() method
+--Modified main class code---
+package in.nareshit.raghu;
+
+//ctrl+shift+O
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2FirstExampleApplication {
+	//ctrl+F11(Run)
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2FirstExampleApplication.class, args);
+		//read(get) object (bean) from Spring container
+		Object ob  = ac.getBean("dbConn");
+		System.out.println(ob);//toString
+	}
+
+}
+> Right click > Run as > Spring Boot Application
+
+
+===============================================================
+@Component - Spring container creates object to your class
+
+@Value -- Read data from Proeprties/YAML file
+  @Value("${ }")
+

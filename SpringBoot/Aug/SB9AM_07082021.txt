@@ -1,0 +1,173 @@
+			Date : 07/08/2021
+			Spring Boot 9AM
+			   Mr. RAGHU
+	----------------------------------------------------
+Spring Core -2 (Autowired)
+https://youtu.be/-FlszP92JVM?list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr
+
+https://www.facebook.com/groups/1494103237470868/search/?q=github
+https://www.facebook.com/groups/1494103237470868/search/?q=junit
+https://www.facebook.com/groups/1494103237470868/search/?q=maven
+
+
+Maven Videos(3):
+https://www.youtube.com/watch?v=9eJAvApRAI0
+https://www.youtube.com/watch?v=jOykBjSl1X0
+https://www.youtube.com/watch?v=iLwuhbnFPqo
+
+
+JUnit:
+https://www.youtube.com/watch?v=PT9WQ_Rz1ew
+https://www.youtube.com/watch?v=Rue28g3reRI
+
+
+Mockito Overview:
+https://youtu.be/6hmx--O8PYE
+https://youtu.be/pFLFKrCknB0
+https://youtu.be/GgWuE-k1_nI
+http://youtu.be/tWdqtEXE47A
+
+
+Spring Boot UnitTest code
+https://github.com/javabyraghu/SpringBoot2UnitTestApp
+
+
+Git:
+https://www.youtube.com/watch?v=T2UHpsxJ-2o
+https://www.youtube.com/watch?v=38UGVeXuj3Q
+
+
+AGILE
+https://www.youtube.com/watch?v=MoxspPivr_Q
+
+
+Debug:
+https://www.youtube.com/watch?v=HwwF4pvYWws
+
+
+Log4J
+https://www.youtube.com/watch?v=mblGoKU1aKo
+https://www.youtube.com/watch?v=5oLfHiP_iJc
+
+
+ELK
+https://www.youtube.com/watch?v=uSYExRWbC9Y
+
+
+Docker:
+https://www.youtube.com/watch?v=LmoLFcoaeQw
+https://www.youtube.com/watch?v=6_6MoohzdEI
+
+
+Redis Cache:
+https://www.youtube.com/watch?v=HBmlNMGh9O0
+https://www.youtube.com/watch?v=IwYEdZOmY6g
+
+
+Spring Boot Captcha#1
+https://www.youtube.com/watch?v=P_zqWKvOi54
+Spring Boot Captcha#2
+https://www.youtube.com/watch?v=fcRs5pgtJYQ
+
+
+Cloud Deploy:
+https://www.youtube.com/watch?v=QOwgiJWmZ9k
+
+	--------------------------------------------------
+		   Inputs to Applications		
+
+--Priority Order-------------
+a. Option args (Commands Line Args)  [ --key=val]
+b. VM Args
+c. application.properties
+d. application.yml
+
+*) What ever process we use, finally we can read data using
+   @Value or @ConfigurationProperties only.
+
+----------------------------------------------------------
+a. Option args (Commands Line Args)  [ --key=val]
+
+> Passsing data while running application using key=val format.
+> must follow format --key=val
+> This is input to main method / starter class.
+> These key=val data finally stored in Common memory Environment.
+
+  Code    Compile         build            Run
+.java --> .class  --->  .jar/.war  --> java -jar Sample.jar --key=val 
+
+-----------------------------------------------------------------
+> code <
+Name : SpringBoot2InputTest
+Dep  : Lombok
+
+a. application.properties
+my.client=SAMPLE
+
+b. Model class
+package in.nareshit.raghu.model;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+@Component
+@Data
+public class ProductInfo {
+
+	@Value("${my.client}")
+	private String client;
+	
+}
+
+c. Runner class
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.model.ProductInfo;
+
+@Component
+public class TestDataRunner implements CommandLineRunner {
+
+	@Autowired
+	private ProductInfo pob;
+	
+	public void run(String... args) throws Exception {
+		System.out.println(pob);
+	}
+
+}
+
+--Follow these--------------------------------
+> Right click on Project > Run as > maven Clean > maven Install
+ [jar file is created under target folder]
+> Right click on Project > Refresh > open target folder
+ Jar name : ArtifactId-version.jar
+> Goto Jar Location > Right click on Jar > Properties > Goto Explorer
+> open cmd location (cmd > enter) > type commands
+
+ cmd> java -jar \SpringBoot2InputTest-1.0.jar
+
+ cmd> java -jar \SpringBoot2InputTest-1.0.jar  --my.client=DUMMY
+-----------------------------------------------------------------
+
+*) Passing Option args using STS:
+> Finish Code
+> Open Main class
+> Right click on Main class > Run as > Run Configuration
+> Click on Arguments tab > Goto Program Arguments
+> Enter data like --key=val
+ex: 
+    --my.client=NIT-TEST
+--------------------------------------------------------------
+       Option-args                       Properties
+    -----------------------------------------------------
+   Client Specific Data                Database Connection
+   Memory related things                 Email Properties
+     Env setup data                       ORM Properties
+     Profiles data                     Web MVC, Security, Actuator...etc
+------------------------------------------------------------------

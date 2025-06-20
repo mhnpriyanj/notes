@@ -1,0 +1,112 @@
+				Date : 20-Jul-21
+				Spring Boot 9AM
+				   Mr. RAGHU
+		----------------------------------------------------
+		 https://www.facebook.com/groups/thejavatemple
+			     javabyraghu@gmail.com
+
+Admin: 
+Srikanth Sir : +91-630 296 8665 (whatsapp)
+			
+Maven:
+https://www.youtube.com/watch?v=9eJAvApRAI0
+https://www.youtube.com/watch?v=jOykBjSl1X0
+https://www.youtube.com/watch?v=iLwuhbnFPqo
+
+Gradle:
+https://www.youtube.com/watch?v=xQQ982rgP9c
+
+
+Spring Boot application 3 files
+a. Starter class | main class
+b. Input Files [ application.properties | application.yml ]
+c. Build File  [ Maven -- pom.xml  | Gradle -- build.gradle ]
+
+=> Above 3 files are auto-generated when we create new Spring Boot application.
+
+a. Starter class | main class:-
+ This class is used to run your application and creates Spring Container
+ (new : ApplicationContext)
+
+> Spring Container:
+1. Find your class, create object
+2. Set data to variables
+3. Link objects
+4. Destory the container (when we stop app)
+
+---------------------------------------------------------------
+b. Input Files [ application.properties | application.yml ]
+
+=> Spring container creates object, but data need to be provided by
+   programmer ex: Database Connection keys.
+
+=> Data must be passed using key=val format.
+   Here keys can be pre-defined(99%) or programmer defined(1%).
+
+Link: pre-defined keys
+https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+
+---application.properties-----------
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+spring.datasource.url=jdbc:mysql://localhost:3306/test
+spring.datasource.username=system
+spring.datasource.password=nit
+------------------------------------
+
+-----application.yml--------------
+spring:
+   datasource:
+      driver-class-name: oracle.jdbc.driver.OracleDriver
+      url: jdbc:mysql://localhost:3306/test
+      username: system
+      password: nit
+----------------------------------
+
+c. Build File  [ Maven -- pom.xml  | Gradle -- build.gradle ]
+
+1. Parent Project Details(name,version)
+2. your project details (Your projectName, your project version)
+3. Version properties (JDK version, 
+	Spring Boot version, Spring Cloud version..etc)
+4. *** What are all jars(dependnecies) required for your project
+5.** Plugins (JAR/WAR)
+Ex:
+ Jar plugin, war plugins, compiler plugins
+.java --> .class --> .jar/.war
+------Softwares------------------------------------------------------------
+1. JDK 8/11/Latest (any one)
+https://www.oracle.com/java/technologies/javase-jdk16-downloads.html
+
+2. Eclipse
+https://www.eclipse.org/downloads/packages/release
+Recomanded:
+https://www.eclipse.org/downloads/packages/release/2021-03/r
+
+(Eclipse IDE for Enterprise Java and Web Developers)
+
+> Click on OS based link 'Windows' > Download Link
+> Downloaded as 'eclipse-jee-2021-03-R-win32-x86_64.zip'
+> Extract to a folder (Right click > Extract , ex: eclipse)
+> Open folder 'eclipse'
+> Double Eclipse Icon
+> Create a folder 'D:\EclipseWorkspace'
+> Enter same as workspace and Launch
+-----------------------------------------------------------------
+3. Create Spring Boot Application
+> Goto Spring Initializer Web Site 'https://start.spring.io/'
+> Fill all details
+   Name   : SpringBootFirstApplication
+   Package: in.nareshit.raghu
+ (Remaining all default only)
+> Click on Generate Button
+ Ex: SpringBootFirstApplication.zip (Generated)
+> Right click and Extract
+
+
+4. Import project into Eclipse
+> File > Import > Search with Maven > Existed Maven Project
+> next > Browse for location of pom.xml file
+         ex: D:\bootapps\SpringBootFirstApplication (press enter)
+> next > finish
+        (wait for 10 min for first time)
+======================================================================

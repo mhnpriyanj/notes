@@ -1,0 +1,252 @@
+				Date : 27-Jul-21
+				Spring Boot 9AM
+				   Mr. RAGHU
+		------------------------------------------------
+Java Additional concepts (Free batch) # 5:30pm
+ZoomId : 99582895224 / pwd : 112233
+         ---------------------------------------------------------------------
+				Project Lombok
+
+(a) @NoArgsConstructor :
+  This annotation is used to generate Default/zero param constrcutor.
+
+(b) @AllArgsConstructor :
+  It will generate all variables as Params constrcutor.
+  (if class has zero variables then generates Default/zero param constrcutor)
+
+(c) @Setter / @Getter : To generate set/get methods we can use these annotations
+
+-> We can apply at class level so that generated for every variable.
+-> We can apply at selected vriable level, to avoid for all variables.
+
+--Example--
+package in.nareshit.raghu.model;
+
+import lombok.Getter;
+import lombok.Setter;
+//ctrl+shift+O
+@Setter
+@Getter
+public class Product {
+
+  private Integer pid;
+
+}
+--Generated Code-------------
+package in.nareshit.raghu.model;
+public class Product {
+   private Integer pid;
+
+   public void setPid(Integer pid) {
+      this.pid = pid;
+   }
+
+   public Integer getPid(){
+      return pid;
+   }
+
+}
+*) VariableName start with lowercase, then while using set/get method names
+   it follows FirstLetter Uppercase rule(CamelCase)
+
+--------------------------------------------------------------------------
+*) toString() :
+> This method exist in Object class (Which is common super class for all)
+> We can override this method : non-final, non-static and non-private.
+> Default logic is
+    Full Class name + @ + HashCode-In Hexa Decimal value
+
+=========================================================================
+(d) @ToString : This annotation is used to override toString() method in your class
+
+--Example---
+@ToString
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+}
+--Generated Source code--
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+
+	public String toString() {
+		return "Product (pid=" + pid + ", pcode=" + pcode + ", pcost=" + pcost + ")";
+	}
+}
+=============================================================================
+@RequiredArgsConstructor : This annotation is used to generate selected
+  	variables constrcutor. To select variable apply @NonNull over variable.
+
+--Example---------
+package in.nareshit.raghu.model;
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class Product {
+	private Integer pid;
+	@NonNull
+	private String pcode;
+	private Double pcost;
+	
+}
+----------Generated code----------------
+package in.nareshit.raghu.model;
+public class Product {
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	public Product(String pcode) {
+	   super();
+	   this.pcode = pcode;
+	}	
+}
+---------------------------------------
+Ex#2
+package in.nareshit.raghu.model;
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class Product {
+	
+	private Integer pid;
+	@NonNull
+	private String pcode;
+	@NonNull
+	private Double pcost;
+	
+}
+----------Generated code----------------
+package in.nareshit.raghu.model;
+public class Product {
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	public Product(String pcode,Double pcost) {
+	   super();
+	   this.pcode = pcode;
+	   this.pcost = pcost;
+	}	
+}
+
+*) @RequiredArgsConstructor will generate default constrcutor
+    if no variable is having @NonNull annotation.
+
+---Example----------------------------
+package in.nareshit.raghu.model;
+import lombok.RequiredArgsConstructor;
+@RequiredArgsConstructor
+public class Product {
+	
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	
+}
+----------Generated code----------------
+package in.nareshit.raghu.model;
+public class Product {
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	public Product() {
+	   super();
+	}	
+}
+
+-------------********--------------------------------*******---------
+package in.nareshit.raghu.model;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class Product { }
+
+*) Lombok generates 3 default constructors, compiler gives error.
+-------------********--------------------------------*******---------
+*) equals() and ==  
+'by default they are same, until we override equals method in our class'
+This equals() method is defined in Object class which is using == operator
+inside equals() method.
+
+@EqualsAndHashCode: To compare two different object data (not references) 
+  we have to override equals() method in our class.
+
+
+--Example---
+@EqualsAndHashCode
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+}
+---Generated code-----
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((pcode == null) ? 0 : pcode.hashCode());
+		result = prime * result + ((pid == null) ? 0 : pid.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		if (pcode == null) {
+			if (other.pcode != null)
+				return false;
+		} else if (!pcode.equals(other.pcode))
+			return false;
+		if (pid == null) {
+			if (other.pid != null)
+				return false;
+		} else if (!pid.equals(other.pid))
+			return false;
+		return true;
+	}
+
+-----Ex----------------------------------------------------------
+
+package in.nareshit.raghu;
+
+import in.nareshit.raghu.model.Product;
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		Product p1 = new Product(101, "AA");
+		Product p2 = new Product(101, "AA");
+		
+		System.out.println(p1.equals(p2));//true
+		System.out.println(p1==p2);//false
+		
+		
+		System.out.println(p1.hashCode()); //modified
+		System.out.println(System.identityHashCode(p1)); //actual hashCode
+		System.out.println(p2.hashCode()); //modified
+		System.out.println(System.identityHashCode(p2)); //actual hashCode
+	}
+}

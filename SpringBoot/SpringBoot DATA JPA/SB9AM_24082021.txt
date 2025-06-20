@@ -1,0 +1,211 @@
+				Date : 24-08-2021
+				Spring Boot 9AM
+				 Mr. RAGHU
+		--------------------------------------------
+				Hibernate with JPA
+1. Entity Class
+2. Configuration XML
+3. Test/Main class
+
+1. Entity Class : A class that is mapped with Database table using
+		JPA Annotations. (@Entity, @Table, @Id, @Column ..etc)
+
+@Entity
+@Table(name="stdtab")
+class Student {
+   @Id
+   @Column(name="sid")
+   Integer stdId;
+   @Column(name="sname")
+   String stdName;
+   @Column(name="sfee")
+   Double stdFee;
+
+}
+
+@Entity : Must be applied on top of class, that maps class with table
+		and variable with columns.
+
+@Id  :It indicates Primary Key, it must be applied over a variable.
+
+@Table :It is optional. If we do not provide tableName, then class name is
+		taken as tableName.
+
+@Column : It is optional. If we do not provide ColumnName, then variable name is
+		taken as ColumnName.
+
+-------------------------------------------------------------------------
+*) Hibernate Initial Releases are not implementation of JPA.
+   They are just ORM implementation.
+*) After Hibernate 5.x (5.2.x) is following JPA implementation.
+
+ ---------------------------------------------------------
+    old                                new(any vendor)
+ ---------------------------------------------------------
+  SessionFactory              EntityManagerFactory
+  Session                     EntityManager
+  Transaction                 EntityTransaction
+ ---------------------------------------------------------
+   save(obj):Serializable     persist(obj):void
+   update(obj)                merge(obj)
+   delete(obj)                remove(obj)
+   get(T.class,id)            find(T.class,id)
+
+
+Connection---> EntityManagerFactory
+2. operation  ---> EntityManager
+insert   
+fetch
+
+--code-----------------------------
+tx.begin()
+
+Op1 //debit amount 500 --success
+Op2 //credit amount 500-- fail
+
+tx.commit()/ tx.rollback();
+--------------------------------------------
+persist(obj): INSERT INTO SQL....
+
+==Coding===============================================================
+a. Maven (Simple Project)
+
+b. pom.xml
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+	<dependencies>
+	
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.4.32.Final</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.26</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.20</version>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+
+b. Entity class
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data	
+@Entity
+@Table(name="stdtab")
+public class Student {
+
+	@Id
+	@Column(name="sid")
+	private Integer stdId;
+	@Column(name="sname")
+	private String stdName;
+	@Column(name="sfee")
+	private Double stdFee;
+	
+}
+
+b. persistence XML File
+---------persistence.xml--------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+        http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="AppDB">
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/boot9am" />
+            <property name="javax.persistence.jdbc.user" value="root" />
+            <property name="javax.persistence.jdbc.password" value="root" />
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.format_sql" value="true" />
+            <property name="hibernate.hbm2ddl.auto" value="create" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect" />
+        </properties>
+    </persistence-unit>
+</persistence>
+
+
+3. Test class
+package in.nareshit.raghu.test;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+
+import in.nareshit.raghu.entity.Student;
+
+public class TestClass {
+
+	public static void main(String[] args) {
+		EntityTransaction tx = null;
+		try {
+			//Load Driver, Create Connection, support statement preparation
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("AppDB");
+			System.out.println(emf.getClass().getName());
+
+			//supports operation, execution, setdata, result
+			EntityManager em = emf.createEntityManager();
+			System.out.println(em.getClass().getName());
+			
+			tx = em.getTransaction();
+			tx.begin(); //start tx
+			
+			Student sob = new Student();
+			sob.setStdId(101);
+			sob.setStdName("SAMPLE");
+			sob.setStdFee(200.0);
+			
+			em.persist(sob);
+			
+			tx.commit();//on success
+		} catch (Exception e) {
+			e.printStackTrace();
+			tx.rollback();//on failure
+		}
+		
+	}
+}
+======================================================================
+<dependency>
+	<groupId>com.jslsolucoes</groupId>
+	<artifactId>ojdbc6</artifactId>
+	<version>11.2.0.1.0</version>
+</dependency>
+---------------------------------------------------------------------
+oracle.jdbc.driver.OracleDriver
+jdbc:oracle:thin:@localhost:1521:XE
+org.hibernate.dialect.Oracle10gDialect
+org.hibernate.dialect.Oracle9iDialect
+org.hibernate.dialect.Oracle12cDialect
+---------------------------------------------------------------------
+MySQL :
+https://dev.mysql.com/downloads/installer/
+Click on 2nd optiona
+No, Thanks options in bttom
+Double click on:
+ mysql-installer-community-8.0.26.0
+
+> Choose Server only > Next > next > finish
+> username : root , password: root
+===================================================================

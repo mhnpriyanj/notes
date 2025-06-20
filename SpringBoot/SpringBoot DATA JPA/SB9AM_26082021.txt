@@ -1,0 +1,273 @@
+				Date : 26-08-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+	--------------------------------------------------------------------
+
+Oracle 10gXE (Light Version)
+https://www.mediafire.com/file/roc48z1i6iitpu4/OracleXE.exe/file
+
+			   Spring Boot - Data JPA
+
+=> Data JPA Generates one Proxy class by taking SimpleJpaRepository(C) 
+   as input Template.
+
+a. CrudRepository<T,ID>
+b. PagingAndSortingRepository<T,ID>
+c. JpaRepository<T,ID>
+
+---MySQL Commands-----------------------------------
+mysql> drop database boot9am;
+mysql> create database boot9am;
+mysql> use boot9am;
+mysql> show tables;
+=====================================================
+Name : SpringBoot2DataJpaMySQLEx
+Dep  : Lombok, Data JPA, MySQL Driver
+
+1. application.properties
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/boot9am
+spring.datasource.username=root
+spring.datasource.password=root
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+-------------------------------------
+2. Entity/model class ( A class mapped with database table)
+package in.nareshit.raghu.entity;
+
+//ctrl+shift+O
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name="stdtab")
+public class Student {
+	
+	@Id
+	@Column(name="sid")
+	private Integer stdId;
+	@Column(name="sname")
+	private String stdName;
+	@Column(name="sfee")
+	private Double stdFee;
+	
+}
+-----------------------------------
+3.
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.repository.CrudRepository;
+import in.nareshit.raghu.entity.Student;
+
+public interface StudentRepository 
+	extends CrudRepository<Student, Integer> {
+
+}
+------------------------------------
+4. Runner#1 (Checking Proxy class is generated or not?)
+
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.repo.StudentRepository;
+
+@Component
+public class StudentTestRunner implements CommandLineRunner {
+
+	@Autowired
+	private StudentRepository repo;
+	
+	public void run(String... args) throws Exception {
+		System.out.println(repo.getClass().getName());
+	}
+
+}
+---------------------------------------------------------
+Runner #2 Insert operation
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Student;
+import in.nareshit.raghu.repo.StudentRepository;
+
+@Component
+public class StudentTestRunner implements CommandLineRunner {
+
+	@Autowired
+	private StudentRepository repo;
+	
+	public void run(String... args) throws Exception {
+		Student sob = new Student();
+		sob.setStdId(101);
+		sob.setStdName("SAMPLE");
+		sob.setStdFee(200.0);
+		repo.save(sob);
+	}
+
+}
+
+
+mysql> show tables;
++-------------------+
+| Tables_in_boot9am |
++-------------------+
+| stdtab            |
++-------------------+
+1 row in set (0.01 sec)
+
+mysql> select * from stdtab;
++-----+------+--------+
+| sid | sfee | sname  |
++-----+------+--------+
+| 101 |  200 | SAMPLE |
++-----+------+--------+
+1 row in set (0.00 sec)
+
+*) JDBC 4.x has provided -AutoLoading of Driver class
+  ie if we did not specify driver class, based on URL and JAR in classpath
+  Driver is loaded and Register.
+
+*) Hibernate (4.x)- Auto Detect of Dialect is exist, if we did not specify
+  any dialect also fine.
+============================================================================
+Oracle 10g XE UI :
+http://127.0.0.1:8080/apex/
+username : system
+password : ******
+---------------------------------
+Open Cmd Prompt
+cmd> sqlplus
+
+Username : system
+Password: ****
+
+SQL> create user raghu identified by nit;
+User created.
+SQL> grant dba to raghu;
+Grant succeeded.
+
+SQL> conn
+Enter user-name: raghu
+Enter password: nit
+==================================================================
+url  for oracle : jdbc:oracle:thin:@<IP>:<PORT>:<SID>
+cmd> ipconfig  (in db server)
+     192.168.0.4
+
+==> for SID
+SQL> select * from global_name;
+GLOBAL_NAME
+---------------
+XE
+
+
+==> For PORT number
+cmd> tnsping XE
+cmd> tnsping ORCL
+
+===SpringBoot with Oracle==============================================
+name : SpringBoot2DataJpaOracle
+Dep  : Data Jpa, Lombok, Oracle
+
+*)pom.xml:-
+<dependency>
+	<groupId>com.oracle.database.jdbc</groupId>
+	<artifactId>ojdbc8</artifactId>
+	<scope>runtime</scope>
+</dependency>
+
+a. application.properties
+#spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:XE
+spring.datasource.username=raghu
+spring.datasource.password=nit
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=create
+#spring.jpa.database-platform=org.hibernate.dialect.Oracle10gDialect
+
+d. Entity class
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name="emptab")
+public class Employee {
+	@Id
+	@Column(name="eid")
+	private Integer empId;
+	@Column(name="ename")
+	private String empName;
+	@Column(name="esal")
+	private Double empSal;
+}
+
+c. Repository interface
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.repository.CrudRepository;
+
+import in.nareshit.raghu.entity.Employee;
+
+public interface EmployeeRepository 
+	extends CrudRepository<Employee, Integer> 
+{
+
+}
+
+d. Runner class
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Employee;
+import in.nareshit.raghu.repo.EmployeeRepository;
+
+@Component
+public class EmployeeTestRunner implements CommandLineRunner {
+
+	@Autowired
+	private EmployeeRepository repo;
+	
+	public void run(String... args) throws Exception {
+		Employee emp = new Employee();
+		emp.setEmpId(999);
+		emp.setEmpName("SYED");
+		emp.setEmpSal(3250.0);
+		repo.save(emp);
+	}
+
+}
+
+---MySQL------------------------
+https://dev.mysql.com/downloads/installer/
+> Click on 2nd option
+> Choose : No thanks, just start my download.
+> Double click on installer
+> Choose Developer default
+> Next > next 
+> Enter password : root 
+=================================================================
+

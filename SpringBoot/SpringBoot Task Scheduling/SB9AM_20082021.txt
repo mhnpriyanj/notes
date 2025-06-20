@@ -1,0 +1,123 @@
+				Date : 20-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+	---------------------------------------------------------------
+			Spring Boot Scheduling -- cron
+
+corn : CRON Expression used to indicate date and time.
+
+> it contains 6 positions. (Single space)
+
+    SEC    MIN    HRS    DAY    MONTH    WEEKDAY
+    0-59  0-59   0-23   1-31    1-12     1-7/SUN-SAT
+
+> **** Default cron expression indicates date and time (Point of time/at)
+        **** This is not time gap by default******.
+
+*) Scheduling code exist in ScheduledAnnotationBeanPostProcessor.
+------------------------------------------------------------------
+Symbols allowed:-
+1.  Star *  => Every/All/Any
+2.  Dash -  => Range of values
+3.  Comma , => Possible values
+4. Slash  / => Period of time
+
+===Ex========================================================   
+1.  0 0 9 * * *
+=> Execute Given task every DAY at 9:00:00 AM
+
+2. 0 0 11 * * *
+=> Execute Given task every DAY at 11:00:00 AM
+
+3. 0 0 13 * * *
+=> Execute Given task every day at 1:00:00 PM
+
+4. 0 0 18 * * *
+=> Execute Given task every day 6:00:00 PM
+
+5. 0  30  23  *  *  *
+=> Execute Given task every day 11:30:00 PM
+    11PM 30th min 0th sec
+
+6.  0  0  9,21  * * *
+=> Execute Given task every day 2 times
+     9:00:00 AM  and
+     9:00:00 PM
+
+7.  0  15,30,45  10  *  * *
+> Execute Given task every day 3 times
+    10:15:00 AM
+    10:30:00 AM
+    10:45:00 AM
+
+8. 0  0 8,9,10,11,12 *  * *
+> Execute Given task every day 5 times
+   8:00:00 AM
+   9:00:00 AM
+   10:00:00 AM
+   11:00:00 AM
+   12:00:00 PM
+
+9.  0 0 8-12 * * *
+> Execute Given task every day 5 times
+ (same as above #8 meaning)
+
+10. 0  0  0  *  *  *
+> Execute Given task every day 12:00:00 AM
+   (mid night)
+
+11.  0  10-15  9  * * *
+> Execute Given task every day 6 times
+    9:10:00 AM
+    9:11:00 AM
+    9:12:00 AM
+    9:13:00 AM
+    9:14:00 AM
+    9:15:00 AM
+
+12. * * * * * * 
+> Execute Given task for every sec
+
+13. 0 0 14 * * * *
+> Exception 
+IllegalStateException: Encountered invalid @Scheduled method 'showReport': Cron expression must consist of 6 fields (found 7 in "0 0 14 * * * *")
+
+14. 0 0 14 * *
+IllegalStateException: Encountered invalid @Scheduled method 'showReport': Cron expression must consist of 6 fields (found 5 in "0 0 14 * *")
+
+15. 0 0 29 * * *
+IllegalStateException: Encountered invalid @Scheduled method 'showReport': Invalid value for HourOfDay (valid values 0 - 23): 29 '29' in cron expression "0 0 29 * * *"
+
+16. 0 66 9 * * *
+IllegalStateException: Encountered invalid @Scheduled method 'showReport': Invalid value for MinuteOfHour (valid values 0 - 59): 66 '66' in cron expression "0 66 9 * * *"
+
+17. empty string | cron=""
+IllegalStateException: Encountered invalid @Scheduled method 'showReport': Exactly one of the 'cron', 'fixedDelay(String)', or 'fixedRate(String)' attributes is required
+
+18.  0 10 * * * *
+> Execute given task 10 mins gap (wrong answer)
+
+> Execute given task for every hour 10th min
+  App Started now 9:47:00AM
+  >>1st execution 10:10:00 AM
+  >>2nd execution 11:10:00 AM
+  >>3rd execution 12:10:00 PM
+  >>4th execution 1:10:00 PM
+
+19. 10 * * * * *
+> Execute given task for every minute 10th sec
+  App Started now 9:47:25 AM
+  >>1st execution 9:48:10 AM
+  >>2nd execution 9:49:10 AM
+  >>3rd execution 9:50:10 AM
+
+20. 1 * * * * *
+> Execute given task for every minute 1st sec
+
+21. */10 * * * * *  [/ period of time]
+> Execute given task for every 10 sec gap.
+
+=======================================================
+22.  0  0  9  10  3  MON-FRI
+> execute given task on Mar-10th 9:00:00 
+   If day is not SAT and SUN 

@@ -1,0 +1,232 @@
+				Date : 28-Jul-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		-----------------------------------------------
+5:30pm IST | Zoom Id : 99582895224 / Pwd : 112233
+
+Link:
+https://www.youtube.com/watch?v=kSceQH4fFi4
+
+Online Decompiler:
+http://www.javadecompilers.com/
+		----------------------------------------------------
+				Project Lombok 
+
+@Data : This is simplified annotation that provides 
+>   Set/Get
+>   toString
+>   equals and hashCode
+>   Required Args Constrcutor
+
+--Ex#1------------------
+@Data
+class Employee {
+  Integer eid;
+}
+--Generated Source code---
+class Employee {
+  Integer eid;
+
+  Employee() {}
+
+  setEid(){}
+  getEid(){}
+
+  toString() {}
+
+  equals(){}
+  hashCode(){}
+}
+--Ex#2----------------------
+@Data
+class Employee {
+  @NonNull
+  Integer eid;
+}
+> In this case one param const is generated.
+  Bcoz @Data internally follws Required Args Constrcutor.
+
+--Generated Code--
+class Employee {
+  Integer eid;
+
+  Employee(Integer eid) {//..}
+}
+=====================================================================
+**** Note: @Data provides Required Args Constrcutor only if no external
+		annotation is applied Constructor Annotation
+		( @NoArgsConstructor, @AllArgsConstructor )
+
+--Ex#1--
+@Data
+class Sample {}
+// Here Required Args Constrcutor is applied by @Data annotation
+
+--Ex#2--
+@Data
+@NoArgsConstructor
+class Sample {........}
+// Here Required Args Constrcutor is not applied by @Data annotation
+
+--Ex#3--
+@Data
+@AllArgsConstructor
+class Sample {........}
+// Here Required Args Constrcutor is not applied by @Data annotation
+
+--Ex#4--
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Sample {........}
+// Here Required Args Constrcutor is not applied by @Data annotation
+
+--Ex#5--
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor
+class Sample {........}
+// Here Required Args Constrcutor is not applied by @Data annotation
+
+
+===Full Example========================
+package in.nareshit.raghu.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@Data 
+@NoArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class Product {
+
+	@NonNull
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	
+}
+-->> Generated code contains 3 constrcutors
+a. Zero Param
+b. 1-param -- pid
+c. 3-params -- pid,pcode, pcost
+------------------------------------------------
+*) Builder pattern :
+  calling multiple methods as a chain that creates one final object
+  by executing set of methods/links as a single line of Code.
+
+
+@Builder : Given by Lombok that generates builder pattern methods
+
+--Example---------
+package in.nareshit.raghu.model;
+
+import lombok.Builder;
+import lombok.ToString;
+
+@Builder
+@ToString
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	
+}
+
+----Test class--
+package in.nareshit.raghu;
+
+import in.nareshit.raghu.model.Product;
+
+public class Test {
+
+	public static void main(String[] args) {
+		Product p = Product
+				.builder()
+				.pcode("AA")
+				.pid(101)
+				.pcost(200.0)
+				.build();
+		System.out.println(p);
+	}
+}
+-----------------------------------------------------------------------
+			@ConfigurationProperties
+			     [Bulk Loading]
+
+*) @Value : This annotation is used to read one key data into one variable
+Ex:
+  10 keys then define 10 variables with 10 times @Value.
+
+=> But if we use @ConfigurationProperties annotation only once,
+   need not to use @Value.
+
+--Rules for @ConfigurationProperties---
+a. Every key must have prefix (any common word) in properties file
+b. KeyName must be prefix.variableName  in properties file
+c. Provide prefix(Common word) at class level using 
+   @ConfigurationProperties(pefix="__")
+d. Must generate set/get methods.
+
+--Example------------------------
+1. Model class
+package in.nareshit.raghu.model;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Setter;
+import lombok.ToString;
+
+@Component
+@ToString
+@Setter
+@ConfigurationProperties(prefix="my.app")
+public class Product {
+	
+	private String pcode;
+	private String pvendor;
+	private Double pcost;
+	
+}
+
+2. application.properties
+my.app.pcode=PEN
+my.app.pvendor=NareshIT
+my.app.pcost=500.0
+
+3. Modified main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2ValueLombokTestApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2ValueLombokTestApplication.class, args);
+		Object ob = ac.getBean("product");
+		System.out.println(ob);
+	}
+
+}
+--------------------------------------------------
+*) Note:
+If 
+  Key name is not matching
+  prefix is not matching
+  variable spell is wrong
+  key not exist in properties file
+
+then
+  No Error/No Exception, variable holds default value
+
+*) DataType mismat : NumberFormatException.

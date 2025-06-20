@@ -1,0 +1,273 @@
+			Date : 06/08/2021
+			Spring Boot 9AM
+			  Mr. RAGHU
+		---------------------------------
+		      Spring Boot - Runners
+UniCode table:
+https://unicode-table.com/en/#basic-latin
+
+Runners: 
+   This is used to execute any logic only once, on app starup
+   after creating Spring container.
+
+Where?
+> Test  your logics
+> Execute setup (ex: create roles table with 2 rows ADMIN, EMP)
+   [DB Config, Email Config]
+> Batch Processing API
+> Based on input execute commands/workd
+
+
+Types (2) [interface]?
+a. CommandLineRunner (I) [Spring Boot 1.0]
+b. ApplicationRunner (I) [Spring Boot 1.3]
+
+How to Code?
+Write one impl class and add @Component ..auto-executed.
+------------------------------------------------------------
+CommandLineRunner(I) : 
+> It is given by Spring Boot
+> package : org.springframework.boot
+> It is a Functional Interface
+  [An interface that conains only one abstract method]
+
+> 3 dots (...)-var-args [jdk 1.5]
+    - pass multiple comma separated values
+> having one abstract method : run() executed once by Main class
+
+-coding steps------------------------
+a. define one class with any name
+b. implement CommandLineRunner
+c. override run() method
+d. Add @Component
+e. Define logic inside run() method
+f. Run main class
+
+ctrl+shift+T : SpringApplication
+cltr+L  765
+
+---Example---------------------------------------------
+Name : SpringBoot2RunnersExOne
+Dep  : Lombok
+
+1. Runner class
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MessageRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM MESSAGE RUNNER!");
+	}
+
+}
+
+2. Run main class
+
+=============================================
+*) if we define multiple Runners in Spring Boot application
+   they are executed in Unicode naming order.(A-Z order).
+
+
+--_Ex#1_--------------------------------------------------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MessageRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM MESSAGE RUNNER!");
+	}
+
+}
+--------------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EmailRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM EMAIL RUNNER");
+	}
+
+}
+----------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DatabaseConRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM DB RUNNER");
+
+	}
+
+}
+----------------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CurdOperationsRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM INSERT/UPDATE/DELETE...Runner");
+	}
+
+}
+
+---Output :---------------------
+FROM INSERT/UPDATE/DELETE...Runner
+FROM DB RUNNER
+FROM EMAIL RUNNER
+FROM MESSAGE RUNNER!
+________________________________________________________________
+*) we can modify runners to our own order using annotation
+   @Order(int value)
+
+*) Un Ordered Runners are executed at last with naming rule
+   and with last priority.
+
+--_Ex#2_-----------------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Component
+@Order(10)
+public class DatabaseConRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM DB RUNNER");
+
+	}
+
+}
+--------------------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Component
+@Order(100)
+public class EmailRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM EMAIL RUNNER");
+	}
+
+}
+---------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Component
+@Order(50)
+public class MessageRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM MESSAGE RUNNER!");
+	}
+
+}
+------------------
+package in.nareshit.raghu.runner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Component
+@Order(35)
+public class CurdOperationsRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		System.out.println("FROM INSERT/UPDATE/DELETE...Runner");
+	}
+
+}
+
+Execution order
+1. DatabaseRunner-10
+2. CurdOperationRunner-35
+3. MessageRunner-50
+4. EmailRunner-100
+
+
+*) Runner can,
+  > Read data from Environment( Option-Args, VM args, Properties, YAML)
+  > Can read objects from container (Autowired)
+  > Support Setup Data exeuection
+
+==FAQs============================================================
+*) If we did not specify any Order or just annotatin @Order
+	without value then default value is: 2147483647
+	(Integer.MAX_VALUE)
+
+*) If Runners are having same order then again apply naming rule
+
+Q) Provide below runners execution order?
+
+  RA   --- @Order(-6) 
+  RB   --- @Order(-12)
+  RC   --- @Order(61)
+  RD   --- @Order(61)
+  RE   --- @Order(4)
+  RF   --- No Order
+
+ RB > RA > RE > RC > RD > RF
+
+Q)  Provide below runners execution order?
+
+  RA   --- @Order
+  RB   --- @Order(99)
+  RC   --- @Order(0)
+  RD   --- @Order(-6)
+  RE   --- @Order(Integer.MAX_VALUE)
+  RF   --- No Order
+
+ RD > RC  > RB  > RA  > RE > RF
+
+-----------------------------------------------------------
+Environment(I) [env] : This object is created by Spring Container
+   that holds all key-val loaded from different inputs
+
+StandardEnvironment(C) Impl class choose by Spring Container
+for Environment(I)
+
+> we can pass Input(key-vals) to Spring container in 4 ways  
+  a. Option-args (Command Line Args --key=val)
+  b. VM/System (JVM Arguments)
+  c. application.properties
+  d. application.yml
+
+> we can read data from Spring Container to our code using
+  a. @Value  (in case of Annotation Configuration)
+  b. Environment Autowired
+      env.getProperty()
+         (in case of Java Configuration)
+  c. @ConfigurationProperties (For Spring Boot)
+---------------------------------------------------------
+HK Sir --Core java
+Angular/ReactJS -- Sudhaker sir

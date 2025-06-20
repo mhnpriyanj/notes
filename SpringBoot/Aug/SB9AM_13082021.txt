@@ -1,0 +1,99 @@
+				Date : 13-Aug-21
+				Spring Boot 9AM 
+				  Mr. RAGHU
+		-------------------------------------------------
+		           Spring Boot - AutoConfiguration
+			        [ Using Email ]
+
+https://www.mediafire.com/file/w5x9w5vcmkwkkdv/RaghuSirNareshITJavaPdfs.zip/file
+
+Spring -- one time setup -- code -written by Programmer
+ex: Database Connection, Email Configuration, Pooling details,
+      SessionFactory objects, Template objects...etc
+
+------------------------------Email Application-------------------------------
+
+Manual Approch:-
+a. Goto Mail Server Host (ex: gmail.com)
+b. Enter login details username and password
+c. Click on Compose and Create new Message
+d. Fill details (to,cc,bcc,subject,text,attachment)
+e. send operation
+
+> Spring f/w has provided Java Mail API implementation.
+> POJI-POJO Design  JavaMailSender(I) --- JavaMailSenderImpl(C)
+  (To implement code in Loose Coupled Manner)
+
+--------------------------------------------------------------------------
+JavaMailSenderImpl(C) : This is used to Goto MailServer and Login as user.
+
+--code inside a class : MyMailService (C)----------------
+Create new Message : JavaMailSender#createMimeMessage()
+
+Fill details (to,cc,bcc,subject,text,attachment)
+  : To provide all message details to MimeMessage object
+     use MimeMessageHelper.
+
+Send operation : JavaMailSender#send()
+--------------------------------------------------------------------------
+*) Spring Annotation Configuration : @Component, @Value, ...etc
+   are applied only for Programmer defined classes (if we have source code
+     with us)
+
+*) Spring Java Configuration : @Configuration , @Bean ..etc
+   are used if a class is pre-defined to configure.
+
+----Spring Java Configuration---------------------------
+Step#1 Define one public class with any name
+Step#2 Add @Configuration over class (Container will take as input)
+Step#3 Define one method for one Object
+Step#4 Add @Bean over method (1 object inside container)
+----------------------------------------------------
+@Configuration
+public class _________ {
+   @Bean
+   public  <ClassName>  <objName>() {
+     //object code
+     return __;
+   }
+}
+
+-----------------------------------------------------
+class  DbConn { //it is pre-defined
+  String driver;
+  String url;
+}
+
+@Configuration
+public class AppConfig {
+   @Bean
+   public DbConn  con() {
+      DbConn dbc = new DbConn();
+      dbc.setDriver("--");
+      dbc.setUrl("--");
+      return dbc;
+   }
+}
+
+---------------------------------------------------
+XML Configuration
+<beans>
+  <bean id="" class="">   bean-object inside container
+</beans>
+
+Java Configuration (pre-defined classes --recomanded)
+@Configuration   --- collection of Beans to be created inside container
+  @Bean                 bean -- object inside container
+
+Annotation Configuration (programmer defined class)
+ @Component    --     bean -- object inside container
+
+=======================================================
+class  JavaMailSenderImpl {  //pre-defined class
+    String host;
+    Integer port;
+    String username;
+    String password;
+}
+
+*) Spring Java Configuration File:-

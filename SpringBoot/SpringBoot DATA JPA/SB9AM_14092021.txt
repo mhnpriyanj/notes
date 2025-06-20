@@ -1,0 +1,251 @@
+				Date : 14-09-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+	-----------------------------------------------------------
+				Association Mapping 
+
+S#1 Define two classes and apply HAS-A Relation (create HAS-A Variable)
+
+S#2 Check for Non-Collection  | Collection  Type.  
+   If collection type then change HAS-A variable to collection type.
+
+S#3 Apply Association Mapping annotation over HAS-A Variable.
+
+1...1 | @ManyToOne (unique condition)
+*...1 | @ManyToOne
+1...* | @OneToMany
+*...* | @ManyToMany
+
+S#4 Provide Join Column (or) Join table at HAS-A Variable
+S#5 Draw tables with column details..
+
+
+*) Note: For any Association Mapping, code must be given at HAS-A variable only
+  ie JoinColumn, JoinTable, OneToMany/ManyToOne/ManyToMany...etc
+
+
+Q) Can we create Student ref inside Adress insted of Address inside Student?
+A) 
+
+I. Student having Address  [ Student---<>Adress ] (valid)
+II. Address having Student (not meaningful)
+
+=======code=======================================================
+1. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+
+2. Entity classes
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="addrtab")
+public class Address {
+	
+	@Id
+	@Column(name="aid")
+	private Integer addrId;
+
+	@Column(name="hno")
+	private String hno;
+	
+	@Column(name="loc")
+	private String loc;
+	
+	@Column(name="pincode")
+	private Long pinCode;
+}
+
+package in.nareshit.raghu.entity;
+
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="stdtab")
+public class Student {
+	@Id
+	@Column(name="sid")
+	private Integer stdId;
+	
+	@Column(name="sname")
+	private String stdName;
+	
+	@Column(name="scourse")
+	private String stdCourse;
+	
+	@OneToMany
+	@JoinColumn(name="sidFk")
+	private List<Address> aobs;
+}
+
+3. Repository interface
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Address;
+
+public interface AddressRepository 
+	extends JpaRepository<Address, Integer> {
+
+}
+
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Student;
+
+public interface StudentRepository 
+	extends JpaRepository<Student, Integer> {
+
+}
+
+4. Runner class
+package in.nareshit.raghu.runner;
+
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Address;
+import in.nareshit.raghu.entity.Student;
+import in.nareshit.raghu.repo.AddressRepository;
+import in.nareshit.raghu.repo.StudentRepository;
+
+@Component
+public class DataInsertSetupRunner implements CommandLineRunner {
+
+	@Autowired
+	private AddressRepository arepo;
+	@Autowired
+	private StudentRepository srepo;
+	
+	@Override
+	public void run(String... args) throws Exception {
+
+		Address a1 = new Address(10, "4-65/B", "AMEERPET", 500013L);
+		Address a2 = new Address(11, "32/F-102", "SR NAGAR", 500014L);
+		
+		Student s1 = new Student(501, "SAM", "Core Java", Arrays.asList(a1,a2));
+		
+		arepo.save(a1);
+		arepo.save(a2);
+		
+		srepo.save(s1);
+		
+		Address a3 = new Address(12, "9-05/T", "KYTP", 500063L);
+		Address a4 = new Address(13, "14-15/8A", "RNJG", 500044L);
+		
+		Student s2 = new Student(502, "SYED", "Adv Java", Arrays.asList(a3,a4));
+		
+		arepo.save(a3);
+		arepo.save(a4);
+		
+		srepo.save(s2);
+		
+	}
+
+}
+=====================================================================
+Cascading :-
+ When we perform any non-select operation(save/update/delete)
+ same you want to apply on child object also, then use cascading.
+
+ if we use cascading such relation is called as Composition
+ else it is called as Aggregation.
+
+--After cascading----
+@OneToMany(cascade = CascadeType.ALL)
+@JoinColumn(name="sidFk")
+private List<Address> aobs;
+------------------------------
+
+--Runner class---
+package in.nareshit.raghu.runner;
+
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Address;
+import in.nareshit.raghu.entity.Student;
+import in.nareshit.raghu.repo.AddressRepository;
+import in.nareshit.raghu.repo.StudentRepository;
+
+@Component
+public class DataInsertSetupRunner implements CommandLineRunner {
+
+	@Autowired
+	private AddressRepository arepo;
+	@Autowired
+	private StudentRepository srepo;
+	
+	@Override
+	public void run(String... args) throws Exception {
+
+		Address a1 = new Address(10, "4-65/B", "AMEERPET", 500013L);
+		Address a2 = new Address(11, "32/F-102", "SR NAGAR", 500014L);
+		
+		Student s1 = new Student(501, "SAM", "Core Java", Arrays.asList(a1,a2));
+		
+		/*arepo.save(a1);
+		arepo.save(a2);*/
+		
+		srepo.save(s1);
+		
+		Address a3 = new Address(12, "9-05/T", "KYTP", 500063L);
+		Address a4 = new Address(13, "14-15/8A", "RNJG", 500044L);
+		
+		Student s2 = new Student(502, "SYED", "Adv Java", Arrays.asList(a3,a4));
+		
+		/*arepo.save(a3);
+		arepo.save(a4);*/
+		
+		srepo.save(s2);
+		
+	}
+
+}
+
+============================================================================

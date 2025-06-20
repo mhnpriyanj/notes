@@ -1,0 +1,33 @@
+				Date : 24-Jul-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		--------------------------------------------
+			  @Value --- Spring Core
+
+a. To provide direct value (hard coded value - direct value assign inside .java file)
+b. **** To read data from Input files (.properties/.yml)
+		@Value("${key}")
+c. SpEL - Spring Expression Language -- @Value("#{expression}")
+
+===================================================================
+*) By default (both) key=val added in properties are String type.
+*) When we try to read using annotation : @Value
+      auto-type conversion is provided. (ie String-->int, String-->double)
+*) If any type-mis match is occured then Spring Boot throws Exception
+  
+   
+Example:-
+   (in class)
+  @Value("${my.app.code}")
+  private Integer code;
+
+  (in properties file)
+  my.app.code=10A
+
+  TypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; 
+  NumberFormatException: For input string: "10A"
+
+-----------------------------------
+int -- default -- 0
+Integer --- default -- null
+-----------------------------------

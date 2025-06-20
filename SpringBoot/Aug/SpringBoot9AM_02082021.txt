@@ -1,0 +1,191 @@
+				Date : 02-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		-----------------------------------------------
+			    @ConfigurationProperties
+
+=> @Value : To read one key data into one variable.
+   Syntax: @Value("${key}")
+
+*) In realtime there can be multiple key-val. 
+   So we need to use @Value multipl times.
+
+*) @ConfigurationProperties is called as Bulk Load.
+   It supports reading multiple keys data into variables by defining
+   this annotation only once at class level.
+
+--Rules----------------------------------------
+a. Must use one common word/prefix for every key.
+b. key name => prefix + variableName
+c. Define @ConfigurationProperties(prefix="COMMON WORD") at class level
+d. Provide variables with setter methods.
+----------------------------------------------------
+
+==Example==============================================
+Name : SpringBoot2ConfigPropsTest
+Dep  : Lombok
+
+1. Model
+package in.nareshit.raghu.model;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+@Component
+@Data
+@ConfigurationProperties(prefix = "my.app")
+public class ProductInfo {
+
+	private Integer pid;
+	private String pcode;
+	private Double pversion;
+}
+
+2. application.properties
+my.app.pid=303
+my.app.pcode=NIT
+my.app.pversion=3.6
+
+3. Modified Main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2ConfigPropsTestApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2ConfigPropsTestApplication.class, args);
+		Object ob = ac.getBean("productInfo");
+		System.out.println(ob);
+	}
+
+}
+============================================================================
+*) if we
+    did not specify matching key-name
+    prefix is not spelled/wrong
+    variable name not matching
+    setter methods not provided
+
+  then 
+    No error
+    no exception
+    no value is injected.
+
+
+*) prefix must, one prefix--one class always.
+  Two or more prefixes can never be connected to one class.
+
+======================================================================
+a. List/Set/Array
+
+Syntax:
+   prefix.variable[index]=value
+
+b. Map/Properties
+
+Syntax:
+   prefix.variable.mapKey=value
+
+c. class Type variable (HAS-A)
+
+   prefix.HasAvariable.variable=value
+
+-----------------------------------------------------------------
+                                  Impl class
+*) List(I) -------------------->
+*) Set(I) -------------------->
+*) Map(I) -------------------->
+
+
+========code============================================
+1. Model
+package in.nareshit.raghu.model;
+
+import java.util.Properties;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Setter;
+import lombok.ToString;
+
+@Component
+@ToString
+@Setter
+@ConfigurationProperties(prefix = "my.app")
+public class ProductInfo {
+
+	private Integer pid;
+	private String pcode;
+	private Double pversion;
+	
+	//private List<String> clients;
+	//private Set<String> clients;
+	private String[] clients;
+	
+	//private Map<String,String> details;
+	private Properties details;
+	
+}
+-----------------------------
+package in.nareshit.raghu.model;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Setter;
+import lombok.ToString;
+
+@Setter
+@Component
+@ToString
+@ConfigurationProperties(prefix="db.con")
+public class DbConn {
+
+	private String driver;
+	private String url;
+	private Integer port;
+}
+--------------------------------
+2. application.properties
+my.app.pid=303
+my.app.pcode=NIT
+my.app.pversion=3.6
+
+my.app.clients[0]=ABC
+my.app.clients[1]=XYZ
+my.app.clients[2]=MNO
+
+my.app.details.A1=GA
+my.app.details.A2=REL
+my.app.details.A3=PROD
+
+db.con.driver=Oracle
+db.con.url=TEST-JDBC-ORCL
+db.con.port=9605
+---------------------------------------------------------
+3. Main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2ConfigPropsTestApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2ConfigPropsTestApplication.class, args);
+		Object ob1 = ac.getBean("productInfo");
+		//Object ob2 = ac.getBean("dbConn");
+		System.out.println(ob1);
+		//System.out.println(ob2);
+	}
+
+}

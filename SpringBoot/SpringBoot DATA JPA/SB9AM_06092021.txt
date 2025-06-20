@@ -1,0 +1,300 @@
+				Date : 06-09-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+		-------------------------------------------------
+				Spring Data JPA
+
+*) Working with Date and Time
+*) Working with BLOB and CLOB
+
+
+	-----------------------------------------------------
+		Working with Date and Time
+	-----------------------------------------------------
+Hibernate with JPA, has provided one annotation: 
+ @Temporal with one Enum TemporalType(E) => DATE, TIME and TIMESTAMP
+
+
+*) we must use java.util.Date(C) that can be mapped to internally
+  java.sql.Date (DATE), 
+  java.sql.Time (TIME) ,
+  java.sql.Timestamp (TIMESTAMP)
+
+*)Note:
+a. Date(java.util) is given by JavaSE, which is used to represent date and time
+   using TimeZone, Month name, Day name count...etc
+
+b. But we want to store date in Database(java.sql), then 3 concept are used
+   which internally uses java.util.Date only
+
+  => Store only Date : year-month-day
+	java.sql.Date
+
+  => Store only time : hrs:mins:sec
+	  java.sql.Time
+
+  => Store Both Date and time : year-month-day hrs:mins:sec
+  	java.sql.Timestamp
+
+---Core java-----------
+package in.nareshit.raghu;
+
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
+
+public class Test {
+
+	public static void main(String[] args) {
+		Date dte = new Date();
+		System.out.println(dte);
+		// Mon Sep 06 09:15:14 IST 2021
+		
+		java.sql.Date d1 = new java.sql.Date(System.currentTimeMillis());
+		System.out.println(d1);
+		
+		Time t1 = new Time(System.currentTimeMillis());
+		System.out.println(t1);
+		
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
+		System.out.println(ts);
+	}
+}
+==============================================================
+*) java.util.Date(C) is designed for Java App for n/w and OS based date and time
+   not recomanded/used to Db transaction data.
+*) In this case java.sql package is provided with 3 types
+
+---package java.sql-----------------
+   class Time extends java.util.Date {  // gnereates only Time }
+   class Date extends java.util.Date {  // gnereates only Date }
+   class Timestamp extends java.util.Date {  // gnereates only Timestamp }
+-------------------------------------
+
+*) If we did not specify type @Temporal and TemporalType then default is
+   given as: @Temporal(TemporalType.TIMESTAMP)
+
+--Example-------------------------------
+Name : SpringBoot2DataJpaEx
+Dep  : Data JPA, Lombok, MySQL
+
+a. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+--------------------------------------------
+b. entity
+package in.nareshit.raghu.entity;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import lombok.Data;
+
+
+@Data
+@Entity
+@Table(name="product")
+public class Product {
+	@Id
+	@Column(name="pid")
+	private Integer pid;
+	@Column(name="pname")
+	private String pname;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="exdte")
+	private Date expDate; //Date and Time
+	
+	@Temporal(TemporalType.DATE)
+	@Column(name="crdte")
+	private Date createdDate; //Date
+	
+	@Temporal(TemporalType.TIME)
+	@Column(name="pckdte")
+	private Date packingTime;//time
+}
+
+c. Repository
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Product;
+
+public interface ProductRepository extends JpaRepository<Product, Integer> {
+
+}
+
+d. Runner class
+package in.nareshit.raghu.runner;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Product;
+import in.nareshit.raghu.repo.ProductRepository;
+
+@Component
+public class ProductDataInsertRunner implements CommandLineRunner {
+
+	@Autowired
+	private ProductRepository repo;
+	
+	public void run(String... args) throws Exception {
+		Date dte = new Date();
+		
+		Product product = new Product();
+		product.setPid(100);
+		product.setPname("SAMPLE");
+		
+		product.setCreatedDate(dte);
+		product.setExpDate(dte);
+		product.setPackingTime(dte);
+		
+		repo.save(product);
+	}
+
+}
+---------------------------------------------------------------------------
+SimpleDateFormat(C) : this is used to format Date object to dislay at browser/to UI
+https://docs.oracle.com/javase/10/docs/api/java/text/SimpleDateFormat.html
+
+---Example code-----------------------
+package in.nareshit.raghu;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Test {
+
+	public static void main(String[] args) {
+		Date dte = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yy HH:mm:ss a zzz");
+		String s = sdf.format(dte);
+		System.out.println(s);
+	}
+	
+	
+}
+   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+			Working with BLOB and CLOB
+   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+BLOB and CLOB are Datatypes in Oracle DB.
+
+
+Q) How can modify/ set max size of LOBs in Database?
+A) set max_allowed_packet
+https://stackoverflow.com/questions/8062496/how-to-change-max-allowed-packet-size
+
+*) @Lob annotation is given by javax.persistence package.
+*) if we use byte[] + @Lob then it creates BLOB
+  and char[] + @Lob creates CLOB types in database
+
+--example--
+1. entity
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="emp_tabs")
+public class Employee {
+	@Id
+	@Column(name="eid")
+	private Integer eid;
+	
+	@Column(name="ename")
+	private String ename;
+	
+	@Column(name="esal")
+	private Double esal;
+	
+	@Column(name="eimg")
+	@Lob
+	private byte[] eimg;
+	
+	@Column(name="edesc")
+	@Lob
+	private char[] edesc;
+}
+
+
+2. Repository
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Employee;
+
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+
+}
+
+3. Runner class
+package in.nareshit.raghu.runner;
+
+import java.io.FileInputStream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Employee;
+import in.nareshit.raghu.repo.EmployeeRepository;
+
+@Component
+public class EmployeeDataInsertRunner implements CommandLineRunner {
+
+	@Autowired
+	private EmployeeRepository repo;
+	
+	public void run(String... args) throws Exception {
+		
+		FileInputStream fis = new FileInputStream("D:\\Images\\emp.jpg");
+		byte[] img = new byte[fis.available()];
+		fis.read(img);
+		
+		String descStr = "Hello!, welcome to HYD, sample, abcdefgHello!, welcome to HYD, sample, abcdefgHello!, welcome to HYD, sample, abcdefgHello!, welcome to HYD, sample, abcdefgHello!, welcome to HYD, sample, abcdefgHello!, welcome to HYD, sample, abcdefgHello!, welcome to HYD, sample, abcdefg";
+		char[] desc = descStr.toCharArray();
+		
+		Employee emp = new Employee(101,"AAA", 200.0, img, desc);
+		
+		repo.save(emp);
+		fis.close();
+	}
+
+}
+=======================================================================
+=> BLOB supports : PDF, Excel, Word, Video, Audio, Image...etc
+=> CLOB Supports : text data only
+==================================================================

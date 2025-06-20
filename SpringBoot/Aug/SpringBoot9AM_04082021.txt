@@ -1,0 +1,164 @@
+				Date : 04-Aug-21
+				Spring Boot 9AM
+				 Mr. RAGHU
+		---------------------------------------------------
+Additional Concepts in Core Java | Spring Core
+Time : 5:30pm IST | 99582895224  | 112233
+
+		--------------------------------------------------
+			      Spring Boot  -- YAML
+
+1. YAML with @Value
+2.** YAML with @ConfigurationProperties
+3. YAML using List,Set, Array, Map, Properties and Classtype
+
+> file extension is .yml
+> Symbols colon (:), dash(-) and underscore(_)
+> Before value must provide one space.
+> All Same levels must have same space count/indentation.
+> Do not write duplicate level/key
+
+------1. YAML with @Value----------
+Name : SpringBoot2YamlWithValueEx
+Dep  : Lombok
+
+
+1. Model 
+package in.nareshit.raghu.model;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.ToString;
+
+@ToString
+@Component("con")
+public class MyConnection {
+	
+	@Value("${my.app.drv}")
+	private String driver;
+	
+	@Value("${my.app.url}")
+	private String url;
+
+	@Value("${my.app.un}")
+	private String username;
+	
+	@Value("${my.app.pwd}")
+	private String password;
+}
+
+2. application.yml
+> Right click on /src/main/resources folder > new > File > Enter name
+ex: application.yml > Finish
+
+my:
+  app:
+    drv: OracleDriver
+    url: JDBC:ORCL-ABCD
+    un: sample
+    pwd: test
+
+3. Modified Main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2YamlWithValueExApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2YamlWithValueExApplication.class, args);
+		Object ob = ac.getBean("con");
+		System.out.println(ob);
+	}
+
+}
+-----Cache issue (pom.xml error)-----------------------------------------------------------------------
+Deleting all in these sub folder
+C:\Users\Raghu\.m2\repository\org\springframework
+C:\Users\Raghu\.m2\repository\org\apache\maven\plugins
+
+> Right click > Run as > maven Clean
+> Right click > Run as > maven Install
+> Right click > Maven > Update project > Force Update
+
+
+--FAQs-------------------------------------------------------------
+Q) Can we delete application.properties and write only application.yml?
+A) Yes. It works no error , no exception, data loaded from application.yml.
+
+Q) if we use both application.properties and application.yml with same key
+   and different value then?
+A) application.properties is high priority 
+		(or)
+   application.properties override application.yml values.
+
+
+Q) If key is not present in both places (or) both files not exist then?
+A)
+ If we are using: @Value then
+    IllegalArgumentException: Could not resolve placeholder 'my.app.drv'
+ If we are loading data using @ConfigurationProperties
+      null data / default value.
+
+---valid example------------
+nit:
+  app:
+    eid       :  1011
+    ename     :  ABCDEF
+----------------------------
+
+*) YAML File is bit faster in loading and execution.
+*) YAML Look and Feel is good.
+*) Both YAML and Properties provides data to Spring container.
+  
+-----------------------------------------------------------------
+2.** YAML with @ConfigurationProperties
+
+a. Model
+package in.nareshit.raghu.model;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+@Data
+@Component
+@ConfigurationProperties(prefix = "nit.app")
+public class Employee {
+
+	private Integer eid;
+	private String ename;
+	
+}
+
+
+b. application.yml
+nit:
+  app:
+    eid   : 1011
+    ename : ABCDEF
+
+
+c. Modified Runner class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2YamlWithConfigPropsApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2YamlWithConfigPropsApplication.class, args);
+		Object ob = ac.getBean("employee");
+		System.out.println(ob);
+	}
+
+}
+---------------------------------------------------------------------------------

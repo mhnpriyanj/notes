@@ -1,0 +1,116 @@
+				Date : 23-08-2021
+				Spring Boot 9AM
+				   Mr. RAGHU
+		---------------------------------------------------
+https://github.com/javabyraghu/HibernateWithJPA
+
+			   Spring Boot - Data JPA
+
+ORM        : (Theory) - Object Relational Mapping 
+		(Database Operations using OOPs)
+JPA        : Specification given by Sun (1st Party)
+		by using this we can write apps(we are 2nd party)
+Hibernate  : Implementation of JPA (JBoss) 
+Data JPA   : Simplicification/Code Generation for DB Operation.
+		Coding not required, generates Hibernate with JPA Code
+	-------------------------------------------------------
+		 OOPs (Theory) --- Java (Programming)
+
+		 ORM (Theory)  --- Sun JPA (Programming)
+
+*) ORM : Object Relational Mapping , every DB Operation using class-objects.
+	ex: save(obj),update(obj),delete(obj), get(id):obj
+
+--Mapping Rule followed by programmer----
+a. Class ------Mapped with------- Table
+b. Variable ---Mapped with------- Column
+
+> Such classes are called as entity classes.
+> In this case, object is converted into Row and 
+   Row can be converted back to Object.
+> Programmer need not to define any SQL query.
+
+> SQL queries are database dependent. 
+	ie SQL query which works for DB#1
+        may not work for another DB.
+
+====(ORM Properties)=============================================================
+a. dialect : 
+     dialects are classes
+     which generates SQL query 
+     when we perform Operation.
+
+(org.hibernate.dialect)
+OracleDialect
+Oracle10gDialect
+Oracle9iDialect
+Oracle12cDialect
+MySQL8Dialect
+
+https://docs.jboss.org/hibernate/orm/5.4/javadocs/org/hibernate/dialect/package-summary.html
+Package name : org.hibernate.dialect
+
+
+b. show_sql : [boolean]
+     true --> Display Generated SQLs at Console
+(default) false --> Do not Display any SQL query.
+
+c. format_sql: [boolean]
+   true ---> Print SQL at console clause by clause
+
+SAMPLE OUTPUT:
+   SELECT 
+        eid,ename 
+   FROM
+	emptab 
+   WHERE
+	esal>200;
+
+d. hbm2ddl.auto : Schema Generation
+   Having 4 possible values
+    1. validate :[default] Programmer takes care of creating/drop/alter tables.
+    2. create   : Hibernate creates table new table alwasy 
+                  (if old table exist drop it and create new one)
+    3. update  : Hibernate creates table new table if not exist else use old table.
+    4. create-drop : Hibernate creates table new table alwasy 
+                  (if old table exist drop it and create new one)
+		  once operation is done, again drop table
+		  (when we stop server/app stopped/finished)
+
+*) Realtime (Production): validate  / update*
+*) Dev Environment      : create 
+*) Testing purpose only : create-drop
+=======================================================================
+API : Collection of classes/intefaces/enum/annotation..etc
+      Used for a Purpose.
+
+ex: Java Mail API : Used for EMail Apps
+     JDBC API : Used for Database Operation
+     Servlets API :Used for Dynamic Web Apps
+     JMS API : used for Message Queues
+     JAXB API : Used for Marshalling/Unmarshalling (XML-JAVA)
+     ..etc
+
+1st Party : API Specification
+2nd Party : API usage for Application
+3rd Party : API Implementation
+
+*)Note:
+1st Party Provides API, 2nd Party uses API for Projects where 3rd Party
+given implementation to few interfaces, logic for annotation processing..etc
+
+Q) What is the diff b/w ORM and JPA?
+A)
+   ORM - Concept/Theory gives rules and guidelines to implement DB Operations
+   JPA - It follows ORM and provided API 
+
+Q) What is the diff b/w JPA and Hibernate?
+A)
+   JPA -- it is a ORM Specification 
+   Hibernate - it is JPA Implementation.
+
+   By using Only API Specification we can not write apps
+   must have any one Implementation.
+----------------------------------------------------
+Q) What is the diff b/w JPA and Data JPA?
+

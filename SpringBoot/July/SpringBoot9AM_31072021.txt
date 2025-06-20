@@ -1,0 +1,22 @@
+				Date: 31-Jul-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+	-----------------------------------------------------------------
+			    Spring Boot : Runners
+
+=> Runners : To execute any logic only once when application is started.
+
+?? Test your code, setup(Database -- Insert Roles on startup), execute batch
+  (on startup)...etc
+
+*) Define one class that implements 
+a. CommandLineRunner (I) [Spring boot 1.0]
+b. ApplicationRunner (I) [Spring boot 1.3]
+
+Q) Where the logic of calling of these runners?
+A)
+  ctrl+shift+T : SpringApplication
+  ctrl+L       : 789
+
+Runners in Boot:-
+https://www.youtube.com/watch?v=8P5x4DH2WHA

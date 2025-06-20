@@ -1,0 +1,158 @@
+				Date : 25-08-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+		-----------------------------------------------------
+Spring Boot : Data JPA (Multiple Database)
+https://www.youtube.com/watch?v=nzszxQbQ5WU
+
+*)Notes:
+a. JPA is a Specification given by Sun/Oracle. That follows ORM Concept.
+
+b. It has provided interfaces like EntityManagerFactory, EntityManager
+		and EntityTransaction..etc
+
+c. Hibernate is a Implementation of JPA (After Hiberenate 5.2.x)
+   SourceForge developed Hibernate-Taken by JBoss and implemented using JPA.
+
+d. Programmer has to follows JPA Spec, so that in future if vendor is
+   changed our code remains same, bit config/jars may be changed.
+
+c. Persistence(C) is using your XML Configuration and loading driver,
+   creating connection, supporting pooling, cache..etc
+   returns Reference as EntityManagerFactory
+
+e. Database Operations: INSERT, UPDATE, DELETE and SELECT are done using
+   EntityManager(I) created using EntityManagerFactory(I).
+
+f. EntityTransaction: Set of Operations executed between beginTx---commit/rollback
+                           is applied as single Tx.
+
+             Begin
+        Operation#1 (success) 1-row insert
+        Operation#2 (success) 1-row insert
+        Operation#3 (success) 1-row insert
+        Operation#4 (fail) 
+
+        Commit/Rollback
+
+> If atleast one failed, all are failed.
+
+Q) Transaction Related/executed to DB or Programming(Java App)?
+A) DB only, our app gives commands/queries to DB. 
+
+
+*) By default every column accepts null values, if we dont want to allow
+	use nllable=false (default is true)
+
+*) if type is String(varchar)--default size is 255 chars
+	to reduce this use length =____
+Ex:
+@Column(name="sname",nullable = false,length = 25)
+
+---Example code---------------------------
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data	
+@Entity
+@Table(name="stdtab")
+public class Student {
+
+	@Id
+	@Column(name="sid")
+	private Integer stdId;
+
+	@Column(name="sname",nullable = false,length = 25)
+	private String stdName;
+
+	@Column(name="sfee",nullable = false)
+	private Double stdFee;
+
+}
+============================================================================
+			Spring Boot Data JPA
+
+*) Spring Boot Data JPA (Spring Data JPA) is internally using
+    Sun JPA and JBoss Hibernate implementation.
+
+*) It supports 2 types of SQLDBs
+   a. Embedded Database : (No Download + No Install/ Runs at RAM)
+        H2, Derby, and HyperSQL(HSQL).
+
+   b. External Database :
+        MySQL, Oracle, Postgress...etc
+
+*) if we move from one database to another databse only jar(Driver JAR)
+   and properties are going to be changed. Code remains same.
+
+---application.properties------------------
+spring.datasource.driver-class-name=
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=
+spring.jpa.database-platform=(dialect)
+--------------------------------------------
+
+*) For Embedded Database above properties comes with default values.
+   Use only for Development/test purpose only, dont use at production.
+
+
+--Code files----------------------------
+1. Entity class
+2. Repository interface
+----------------------------------------
+
+--Core Java------------------------------------------------
+a. Reflection
+https://www.youtube.com/c/NareshIT/search?query=Reflection%20java
+b. Generics
+https://www.youtube.com/c/NareshIT/search?query=Java%20generics
+c. Dynamic Proxy class
+https://docs.oracle.com/javase/8/docs/technotes/guides/reflection/proxy.html
+
+---Spring and other--------------------------------------
+a. JPA with Hibernate
+b. Spring AOP + transaction management
+https://www.youtube.com/watch?v=x2f4NzNCkCI
+https://www.youtube.com/watch?v=8DG-J8_WfUE
+------------------------------------------------------------
+*) Note:
+1. Programmer has to define one interface with Model/Entity class and
+	PK DataType.
+
+2. That interface must extend any one of below type
+	CrudRepository<T,ID>
+	PagingAndSortingRepository<T,ID>
+	JpaRepository<T,ID>
+
+3. For above interfaces implementation logic is given by :
+		SimpleJpaRepository<T,ID>
+
+4. At runtime by taking SimpleJpaRepository template one class is generated
+ (no  .java/.class physically exist) that gives implementation for your
+ entity class based.
+
+5. Transaction Management is implemented using Spring AOP (Aspected Oriented
+	Programming) advices.
+
+  before advice calls beginTx() method
+  afterReturningAdvice (on success) ---> commit()
+  afterThrowingAdvice(on exception) ---> rollback()
+
+6. *** Here, need not to apply @Repository annotation.
+      No Need of Dao-DaoImpl pattern.
+=============================================================
+*) Providing driver class name and dialect in properties file is optional
+  based on URL provided and JAR added(pom.xml)
+  they are auto-detected/loaded.
+
+*) Data JPA is for SQL based databases only. Not supported for NoSQL.

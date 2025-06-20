@@ -1,0 +1,66 @@
+				Date : 03-09-2021
+				Spring Boot 9AM
+				   Mr. RAGHU
+	----------------------------------------------------------------
+https://www.studytonight.com/dbms/database-normalization.php
+
+
+			      JpaRepository
+
+=> Working with JPA Concepts (Collections Mapping, Association Mapping)
+=> Custom Query (findBy, native SQL, JPQL/HQL)
+=> Example Object compare
+... etc
+
+=> JpaRepository internally extends PagingAndSortingRepository (that 
+    internally extends CrudRepository)
+
+	===========================================================
+		  Working with Collections using JPA
+
+JPA Supports : List, Set and Map collections mapping with Database table.
+
+	 --------------------------------------------
+  	    Non-Index based            Index Based
+	 --------------------------------------------
+	    Set                         List, Map
+	 --------------------------------------------
+
+*) If we define entity class with primitive variables
+   then ORM maps with one table(parent table) and variables as columns.
+
+*) if we use collection variable, then ORM maps with one child table.
+
+        1 Collection variable = 1 Child table.
+
+*) Such child table is created with 3 columns. They are:
+   a. Join Column (FK) : Which links parent and child tables.
+   b. Element/Data Column : Actual data of collection
+   c. Index column : it is applied only for List and Map type
+                   List Index number starts from zero
+		   Map Key behaves like index.
+
+*) Set collection comes under non-index type. So this table is created
+	only with 2 columns.
+
+
+Q) Can we store multiple values in single column?
+A) No
+
+Q) How can we store collection data in Database?
+A) Create one additional table and store data, link with actual table.
+
+=================================================================
+@ElementCollection : Must be applied over every collection variable
+
+@CollectionTable(
+    name="",                              //child table name
+    joinColumns= @JoinColumn(name="")     // FK Column name
+)
+
+@Column(name="")   //element column name
+
+@MapkeyColumn(name="") // Index column for Map
+@OrderColumn(name="")  //index for List
+
+------------------------------------------------------------

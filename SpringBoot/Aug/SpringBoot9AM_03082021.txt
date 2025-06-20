@@ -1,0 +1,189 @@
+				Date : 03-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		---------------------------------------------------
+
+Spring Core Videos
+https://youtu.be/xusQhpQuODk?list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr
+https://youtu.be/-FlszP92JVM?list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr
+
+			@ConfigurationProperties annotation
+
+=> To load multiple-keys data into variables using single annotation.
+=> Provide one prefix at class level @ConfigurationProperties(prefix="")
+   and use same prefix at properties file also.
+
+IS-A  : Inheritance
+HAS-A : Association
+
+*) Here child classes objects are created on condition
+  a. If atleast one key-val exist for child class
+  b. Only if Parent Object is created then child object also created
+  c. Set method is required.
+
+*) @ConfigurationProperties is creating child object by loading data
+   from properties and linking with Parent object.
+
+*) @Autowired : if child object is already exist, then link it.
+
+
+Q) Why did we should not add @Component on child class?
+A) This object is created if data exist in properties only.
+   ie conditional object, else memory waste.
+   Such conditional test is done by @ConfigurationProperties.
+
+  If we provide @Component on child then child object is created
+  at every case even no data exist.
+
+
+===Ex code=====================================================================
+Name : SpringBoot2PropertiesConfigPropsEx
+Dep  : Lombok
+
+1. Model 
+package in.nareshit.raghu.model;
+
+import lombok.Data;
+
+@Data
+public class ModelInfo {
+	
+	public ModelInfo() {
+		System.out.println("ModelInfo OBJ");
+	}
+
+	private Integer mid;
+	private String mname;
+	private String color;
+}
+-------
+package in.nareshit.raghu.model;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Setter;
+import lombok.ToString;
+
+@Component
+@Setter
+@ToString
+@ConfigurationProperties(prefix="my.app")
+public class Product {
+	
+	public Product() {
+		System.out.println("PRODUCT OBJ");
+	}
+
+	private Integer pid;
+	private String pcode;
+	
+	private ModelInfo mob;//HAS-A
+}
+
+
+2. application.properties
+my.app.pid=101
+my.app.pcode=ABC
+
+my.app.mob.mid=990
+my.app.mob.mname=XR-T11
+my.app.mob.color=RED
+
+3. Modified Main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2ConfigPropsTwoApplication {
+
+	public static void main(String[] args) {
+	 	ApplicationContext ac = SpringApplication.run(SpringBoot2ConfigPropsTwoApplication.class, args);
+	 	Object ob = ac.getBean("product");
+	 	System.out.println(ob);
+	}
+
+}
+=========================================================================
+for all pre-defined properties keys
+https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+
+-------------------------------------------------------------------------
+			 YAML -- YAMaLiant Language 
+			       ( .yml )
+
+*) YAML is similer to our Properties files in java.
+*) They are easy to define, felxible, light weight (less memory)
+
+*) YAML File data is taken by Snakeyaml API and converts into Spring container
+   understandable format.
+
+*) Every Spring boot application comes with this Snakeyaml Dependency
+   So, auto-conversion is provided.
+     Read data either using @Value (or) using @ConfigurationProperties
+
+
+--Rules to write YAML File data-------------------------
+a) Replace dot(.) with colon(:)
+b) Replace equals(=) with colon(:) one space before value
+c) Goto new line for level and provide atleast one space/tab
+d) Same level of key must have same space count(same indentation/same alignment)
+e) No level/part of key should be repeated. (no duplicates)
+-------------------------------------------------------------------------------
+
+--application.properties---
+spring.datasource.driver-class-name=Oracle
+spring.datasource.url=jdbc-orcl
+spring.datasource.username=system
+spring.datasource.password=nit
+
+--application.yml-------
+spring:
+  datasource:
+     driver-class-name: Oracle
+     url: jdbc:orcl:mysql:abcd
+     username: system
+     password: nit
+------------------------
+
+===Examples========================================
+--application.properties---
+my.app.id=10
+my.app.code=A
+my.one.test=new
+my.one.model=RT
+
+--application.yml---
+my:
+  app:
+     id: 10
+     code: A
+  one:
+     test: new
+     model: RT
+
+-------application.properties---------------
+spring.one.test=A
+my.app.model=OK
+spring.db.un=nit
+spring.db.pwd=xyz
+my.app.grade=ALL
+spring.one.sample=ACTIVE
+
+---application.yml----------------------------
+spring:
+     one:
+        test: A
+        sample: ACTIVE
+     db:
+        un: nit
+	pwd: xyz
+my:
+     app:
+        model: OK
+        grade: ALL
+
+======================================================        

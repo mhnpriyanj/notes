@@ -1,0 +1,134 @@
+				Date : 16-Jul-21
+				Spring Boot 9AM
+				    Mr. RAGHU
+		----------------------------------------------------------
+Spring Core Basics:
+https://www.youtube.com/watch?v=xusQhpQuODk&list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr&index=13
+https://www.youtube.com/watch?v=-FlszP92JVM&list=PLVlQHNRLflP9XSWeY4x4FLwnL3UOIxnTr&index=14
+
+
+		https://www.facebook.com/groups/thejavatemple
+		          javabyraghu@gmail.com
+
+		Admin : Srikanth Sir (Whatsapp) +91 630 296 8665
+
+
+			  Spring Boot Application
+
+Spring container:- [It is a readymade program]
+a. Find/Scan your classes and create object to them
+b. Set data to variables (Inject)
+c. Link one object with another object (Wiring/Autowiring)
+d. Destory the container (when we stop application)
+
+*) Programmer has to provide two inputs
+a. Spring Bean = class [that follows rules given by Spring container]
+b. Spring Configuration File (3)
+     I. XML Configuration (Legacy)   [not exist in Spring Boot]
+    II. Java Configuration
+   III. Annotation Configuration***
+
+
+*) Types of Spring Container(2):-
+I. BeanFactory (I) : it is also called as Old(Legacy) Container
+ 
+ > It supports only XML Configuration
+ > It has one Impl class : XmlBeanFactory(C)
+
+II. ApplicationContext(I) : It is also called as new Container
+
+ > it supports XML, Java and Annotation Configuration
+ > It has multiple Impl classes
+
+   ClassPathXmlApplicationContext (C)
+   FileSystemXmlApplicationContext (C)
+   AnnotationConfigApplicationContext(C) **********[used in Spring boot]
+   ...etc
+
+----Annotations-------------------------------------------------------------
+a. StereoType annotations (5)
+
+1. @Component         : creating object
+2. @Repository        : creating object + Database Operations (insert/update...)
+3. @Service           : creating object + Logics/Calculations/ Transaction Management..
+4. @Controller        : creating object + Web Application (HTTP)
+5. @RestController    : creating object + Restful webservices (HTTP)
+
+> For your class, if this type annotation is present then spring conatiner
+   creates object, else not.
+
+1. @Component         : creating object to your class.
+
+Ex#1
+@Component("sob")
+class Sample {
+
+}
+
+=> Spring container creates object to Sample class using name sob.
+   Sample  sob =  new Sample();
+
+Ex#2
+@Component
+class Sample {
+
+}
+Then object is created by container using name 'sample' 
+ (class name will be taken as object name, first letter lower case)
+
+ Sample  sample =  new Sample();
+
+===================================================================
+-> Data will be provided to application 
+  a. Before running application (setup data)
+
+ex: Database Connection
+     driver=oracle
+     url=jdbc:oracle:thin
+     un=system
+     pwd=root
+
+  b. After running application (runtime data)
+ex:
+   Register User with Form
+   Provide your feedback..etc
+
+===============================================================
+*) Input files in Spring Boot (2)
+a. Properties (application.properties)
+b. YAML  (application.yml)
+
+Above files are used to provide setup data to Spring container
+
+---application.properties------------
+# Comment line
+# key=val
+driver=Oracle
+url=jdbc-orcl
+un=nit
+pwd=raghu
+-------------------------------------
+
+@Value : This annotation reads data from Input files
+   	 and set to one variable
+
+Syntax: @Value("${key}")
+
+---Example--------------------
+@Component
+class DatabaseConnection {
+   
+   @Value("${driver}")
+   String driverClass;
+
+   @Value("${url}")
+   String url;
+
+   @Value("${un}")
+   String username;
+
+   @Value("${pwd}")
+   String password;
+
+}
+

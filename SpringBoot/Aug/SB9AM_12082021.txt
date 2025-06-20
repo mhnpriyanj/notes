@@ -1,0 +1,204 @@
+				Date : 12-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+	  ---------------------------------------------------------
+Runners:-
+https://www.youtube.com/watch?v=8P5x4DH2WHA
+
+
+			     Spring Boot StopWatch
+
+StopWatch (C) : This is given by Spring f/w used to calculate time taken 
+		for a process.
+
+> like method execution time, block execution time..etc
+> Methods: start(), stop()
+
+
+*) Note: 
+a. If we call start() more than once in order then Spring f/w is going to throw
+    IllegalStateException: Can't start StopWatch: it's already running
+
+b. If we call stop() more than once in order then Spring f/w is going to throw
+   IllegalStateException: Can't stop StopWatch: it's not running
+
+----Example-----------
+package in.nareshit.raghu.runner;
+
+import java.util.Random;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
+
+@Component
+public class DataTimeTestRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		StopWatch watch = new StopWatch();
+		watch.start();
+		System.out.println("STARTED");
+		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+			Math.pow(i+1 ,Math.pow(i+1 * (i+1),i+1));
+		}
+		Thread.sleep(2000);
+		
+		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+			Math.pow(i+1 ,Math.pow(i+1 * (i+1),i+1));
+		}
+		Thread.sleep(3000);
+		
+		
+		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+			Math.pow(i+1 ,Math.pow(i+1 * (i+1),i+1));
+		}
+		Thread.sleep(2500);
+		
+		System.out.println("DONE");
+		watch.stop();
+		
+		System.out.println(watch.getTotalTimeSeconds());
+		System.out.println(watch.getTotalTimeMillis());
+		System.out.println(watch.getTotalTimeNanos());
+	}
+
+}
+==============================================================================
+*) To calculate time taken for a process/block use
+      StopWatch(title) and start(taskName)
+
+----------------------------------------------------------
+package in.nareshit.raghu.runner;
+
+import java.util.Random;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
+
+@Component
+public class DataTimeTestRunner implements CommandLineRunner {
+
+	public void run(String... args) throws Exception {
+		StopWatch watch = new StopWatch("APP DATA TIME TEST");
+	
+		watch.start("MY TASK#1"); //taskid
+		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+			Math.pow(i+1 ,Math.pow(i+1 * (i+1),i+1));
+		}
+		Thread.sleep(2000);
+		
+		watch.stop();
+		
+		
+		watch.start("BLOCK#2");//taskid
+		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+			Math.pow(i+1 ,Math.pow(i+1 * (i+1),i+1));
+		}
+		Thread.sleep(3000);
+		watch.stop();
+		
+		watch.start("BLOCK#3"); //taskid
+		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+			Math.pow(i+1 ,Math.pow(i+1 * (i+1),i+1));
+		}
+		Thread.sleep(2500);
+		watch.stop();
+		
+		System.out.println("DONE");
+		
+		/*System.out.println(watch.getTotalTimeSeconds());
+		System.out.println(watch.getTotalTimeMillis());
+		System.out.println(watch.getTotalTimeNanos());*/
+		
+		System.out.println(watch.prettyPrint());
+	}
+
+}
+
+--Output: prettyPrint--------------------
+StopWatch 'APP DATA TIME TEST': running time = 9652816100 ns
+---------------------------------------------
+ns         %     Task name
+---------------------------------------------
+2717010100  028%  MY TASK#1
+3706745000  038%  BLOCK#2
+3229061000  033%  BLOCK#3
+
+ 
+============================================================================
+TimeUnit (E) : JDK 1.5 / Java SE 5
+(java.util.concurrent)
+ NANO     is base
+ MICRO   = 1000L * NANO  
+ MILLI   = 1000L * MICRO  
+ SECOND  = 1000L * MILLI  
+ MINUTE  = 60L * SECOND  
+ HOUR    = 60L * MINUTE  
+ DAY     = 24L * HOUR  
+
+we can convert data from NANO to DAY and reverse even.
+------------------------------------------------
+package in.nareshit.raghu;
+
+import java.util.concurrent.TimeUnit;
+
+public class TestTime {
+
+	public static void main(String[] args) {
+		long val = TimeUnit.MINUTES.toMillis(3);
+		System.out.println(val);
+		System.out.println( TimeUnit.DAYS.toMinutes(1) );
+		System.out.println( TimeUnit.HOURS.toNanos(1) );
+	}
+}
+------------------------------------------------
+Banner :-
+ When we start spring boot application at console Spring LOGO is printed
+ ie called as banner.
+
+*) To disable this use:
+ spring.main.banner-mode=off
+
+*) We can even print our own banner,
+ use : https://devops.datenkollektiv.de/banner.txt/index.html
+ > Enter your text
+ > Place content in banner.txt (under src/main/resources folder)
+
+*) To modify file name from banner.txt to any other use key=val
+    spring.banner.location=classpath:sample.txt
+
+=====================================================================
+VM Arguments:-
+A variable created at JVM level to provide common data to multiple
+application/VM as input in key=val format.
+
+To create this Syntax: -Dkey=val
+
+To Read data :
+   System.getProperty("key"):String value
+
+Q) permgen, heap adjust, ..etc
+Permgen vs Metaspace in Java
+Permgen - Heap memory
+Java 8 - Metaspace
+
+it is a special/diff heap space 
+separated from the main memory heap.
+
+cmd> java -XX:PermSize=100m -XX:MaxPermSize=200m -version
+
+it is now replaced the older PermGen memory space
+=============================================================
+*) VM args are used for JVM inputs, less used in production apps.
+  But Still Spring boot supports as 2nd priority input.
+
+  1st one is Option-args --key=val
+  2nd one is VM-args -D=key=val
+  3rd Profile inputs
+    application-profile.properties
+    application-profile.yml
+  4th Regular Inputs
+    application.properties
+    application.yml
+-----------------------------------------------------------------  

@@ -1,0 +1,98 @@
+				 Date : 21-Aug-21
+				 Spring Boot 9AM
+				   Mr. RAGHU
+	--------------------------------------------------------
+				Cron Expression
+
+  SEC     MIN      HRS      DAY      MONTH      WEEKDAY
+  0-59   0-59     0-23     1-31      1-12       SUN-SAT
+--Cron Expression Date and Time----------------
+1.  0 0 9 10 1 ?
+1.  0 0 9 10 JAN ? (After Spring 5.3.x )
+=>  Execute Given task every year on Jan-10th 9:00:00AM (any weekday is fine)
+
+2. 0 0 9 10,12,15 3 ?
+=> Execute given task every year on Mar (3times) 10th,12th,15 at 9:00:00 AM
+
+3. 0 0 9 15 4  MON-FRI
+=>  Execute Given task every year April-15th at 9:00:00 AM
+     (DAY MUST NOT BE SAT/SUN)
+
+4. 0 0 9 22 9 SAT,SUN
+=> Execute Given task every year Sep-22nd 9AM only if SAT or SUN
+
+5. 0 0 9 12  *  *
+=> Execute Given task every month 12th 9:00:00 AM (any week day)
+
+6. 0 0 9 * 3 *  [special case] (Wrong)
+   
+   0 0 9 ? 3 ?
+
+=> Execute Given task every year March every day 9:00:00AM (any week day)
+
+ When Month is provided and you want to specify ALL DAY / ALL WEEKDAY
+ then must use Symbol ? in place of Star(*).
+
+7.  0 0 9  * 3  SUN (invalid)
+   
+    0 0 9  ? 3  SUN
+
+8.  0 0 9 12 3 *  (invalid)
+
+    0 0 9 12 3 ?
+
+*) Macros : Short format annotation for an expressions
+
+9.  0 0 * * * *    |  @hourly
+=> Execute given task at every hour (0th min, 0th sec)
+
+@Scheduled(cron = "0 0 * * * *")
+@Scheduled(cron = "@hourly")
+---------------------------------------------------------
+Macro				Meaning
+---------------------------------------------------------
+@yearly(or @annually)		once a year (0 0 0 1 1 ?)
+---------------------------------------------------------
+@monthly			once a month (0 0 0 1 * *)
+---------------------------------------------------------
+@weekly				once a week (0 0 0 * * 0)
+---------------------------------------------------------
+@daily (or @midnight)		once a day (0 0 0 * * *)
+---------------------------------------------------------
+@hourly				once an hour, (0 0 * * * *)
+---------------------------------------------------------
+
+1- MON
+.
+.
+.
+.
+7- SUN -- zero(0)
+
+https://spring.io/blog/2020/11/10/new-in-spring-5-3-improved-cron-expressions
+======================================================================
+1. Execute given task once at last day of month
+0 0 9 L * *
+
+2. Execute Givn tas once at Last friday of month
+0 0 9 * * FRIL
+0 0 9 * * 5L
+
+Q) What is last sec of a minute?
+A) 59
+
+Q) What is last min of a Hour?
+A) 59
+
+Q) What is Last hour of a Day?
+A) 23
+
+Q) What is Last day of Month?
+A) We cant say, then use L
+
+Q) What is last month of a year?
+A) 12 / DEC
+
+Q) What is last weekday of a month?
+A) We cant say, then use L
+=====================================================================

@@ -1,0 +1,228 @@
+				Date : 16-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+	---------------------------------------------------------------
+Download:
+https://www.mediafire.com/file/azznpt000w81sqj/SpringBoot9AM_JULY_2021_WS_1.zip/file
+
+			Spring Java based Configuration
+
+a. public class with any name
+b. @Configuration
+c. 1 Method = 1 Bean
+d. @Bean
+
+https://support.google.com/mail/answer/7126229?hl=en
+
+--------------------Email Application---------------------------------
+Spring F/w:- (Spring Java Configuration )
+@Configuration
+public class AppConfig {
+  @Bean
+  public JavaMailSender mailSender() {
+      JavaMailSenderImpl jm = new JavaMailSenderImpl();
+      jm.setHost("smtp.gmail.com");
+      jm.setPort(587);
+      jm.setUsername("sample");
+      jm.setPassword("nit");
+      return jm;
+  }
+}
+pom.xml
+  <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
+    </dependency>
+  </dependencies>
+  <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+   </dependency>
+
+======================================================================
+Spring Boot Email:
+   spring-boot-starter-mail
+   ctrl+shift+T : MailSenderPropertiesConfiguration
+
+   > It provides required jars
+   > It provides Required classes/interfaces
+   > It provides pre-defined Configuration 
+      [AutoConfiguration]
+
+  > But we need to pass input using proeprties
+     [prefix spring.mail ]
+
+Q) What is the default protocol used to send email?
+A) SMTP - Simple Mail Trasfer Protocol.
+
+Q) What are OSI Layers?
+A)
+  P
+  D
+  N
+  T
+  S
+  P
+  A
+
+*)  TLS is better one compred with SSL.
+    
+Q) Are we sending email everytime with attachment or without attachment?
+A) It depends on requirements.
+
+
+Q) are they return same?
+
+I)
+result = a>b ? true : false
+
+II)
+result = a>b ;
+
+Both expressions returns same result for any data.
+2nd one is short format.
+
+--Coding part--------------------------------------------------
+Name : SpringBoot2EmailEx
+Dep  : Mail  (Java Mail Sender)
+
+a. application.properties
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=javaraghu2021@gmail.com
+spring.mail.password=Raghu123.
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+b. MyMailService
+
+package in.nareshit.raghu.service;
+
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyMailService {
+	
+	@Autowired
+	private JavaMailSender sender;
+
+	public boolean send(
+			String to,
+			String[] cc,
+			String[] bcc,
+			String subject,
+			String text,
+			Resource file
+			) 
+	{
+		
+		boolean sent = false;
+		
+		try {
+			//1. create one Message (MIME-Message)
+			MimeMessage message = sender.createMimeMessage();
+			
+			//2. Use Helper class to set data to MimeMessage
+			// [message, is Attachment exist]2 inputs
+			MimeMessageHelper helper = new MimeMessageHelper(message, file!=null);
+			helper.setTo(to);
+			
+			if(cc!=null && cc.length>0)
+				helper.setCc(cc);
+			
+			if(bcc!=null && bcc.length>0) 
+				helper.setBcc(bcc);
+			
+			helper.setSubject(subject);
+			helper.setText(text);
+			
+			if(file!=null) {
+				//file name, data
+				helper.addAttachment(file.getFilename(), file);
+			}
+			
+			//3. send email
+			sender.send(message);
+			
+			sent = true;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			sent = false;
+		}
+		
+		return sent;
+	}
+}
+
+c. Runner class
+package in.nareshit.raghu.runner;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.service.MyMailService;
+
+@Component
+public class TestEmailRunner implements CommandLineRunner {
+
+	@Autowired
+	private MyMailService service;
+
+	public void run(String... args) throws Exception {
+
+		Resource file = new FileSystemResource("D:/Images/kola.jpg");
+
+		boolean sent =
+				service.send(
+						"raghutest2022sr@gmail.com", //to
+						new String[] { //cc
+								"pramodkvish24@gmail.com",
+								"akshitasahrma468@gmail.com",
+								"smartenoughere@gmail.com"
+
+						}, 
+						new String[] { //bcc
+								"naveenr081452@gmail.com",
+								"vickydeshwali74@gmail.com",
+								"ravigalla333@gmail.com"
+
+						}, 
+						"WELCOME TO ALL BOOT STUDENTS!", //subject
+						"HELLO USER " + new Date(), //text
+						file //attachment
+						);
+
+		if(sent) {
+			System.out.println("SENT! CHECK INBOX!!");
+		} else {
+			System.out.println("SENDING FAILED!!!");
+		}
+	}
+
+}
+
+
+==============Enable Less secure app===================
+
+*) Create new Gmail Account
+*) Login and Click on Profile Name (Top right corner)
+*) Manage Your google Account
+*) Click on Security
+*) Enable Less Secure Apps
+*) Turn it on.
+-----------------------------------------------------------

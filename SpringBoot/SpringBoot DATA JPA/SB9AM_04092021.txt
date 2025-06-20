@@ -1,0 +1,296 @@
+				Date : 04-09-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+	------------------------------------------------------------
+		
+		Non-Index                  Index
+		  Set                     List,Map
+
+
+=> 1 collection = 1 child table 
+  (3 columns Join Column/Index Column /Element Column)
+
+*) @ElementCollection must be applied on top of collection variable
+  it creates child collection table and map with variable.
+
+*) @CollectionTable, JoinColumn, Element Column(@Column), Index Column
+  (@OrderColumn/ @MapKeyColumn) are optional.
+
+=> PK - Unique, Not null
+=> FK - Refers PK values, can be duplicate, can be null..
+
+https://www.w3schools.com/sql/sql_constraints.asp
+
+===========Full code====================================================
+Name : SpringBoot2DataJpaCollections
+Dep  : Data Jpa, MySQL, Lombok
+
+1. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+
+2. Entity
+package in.nareshit.raghu.entity;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name="emptab")
+public class Employee {
+	@Id
+	@Column(name="eid")
+	private Integer empId;
+	@Column(name="ename")
+	private String empName;
+	@Column(name="esal")
+	private Double empSal;
+	
+	@ElementCollection
+	@CollectionTable(
+			name="emp_proj_tab", //child table name
+			joinColumns = @JoinColumn(name="eid") //Fk column name
+			)
+	@Column(name="eproj") //element column name 
+	private Set<String> empProjs; 
+	
+	
+	@ElementCollection
+	@CollectionTable(
+			name="emp_mod_tab", //child table name
+			joinColumns = @JoinColumn(name="eid") //FK column name
+			)
+	@Column(name="module") //element column name
+	@OrderColumn(name="position") //index column name
+	private List<String> empModules;
+	
+	
+	
+	@ElementCollection
+	@CollectionTable(name="emp_clients_tab", //child table
+		joinColumns = @JoinColumn(name="eid") //Fk column
+	)
+	@Column(name="client_name") //element column
+	@MapKeyColumn(name="client_code") //index column
+	private Map<String,String> empClients;
+	
+}
+
+
+3. Repository
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import in.nareshit.raghu.entity.Employee;
+
+public interface EmployeeRepository
+	extends JpaRepository<Employee, Integer> {
+
+}
+
+
+4. Runner class
+package in.nareshit.raghu.runner;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Employee;
+import in.nareshit.raghu.repo.EmployeeRepository;
+
+@Component
+public class EmployeeTestRunner implements CommandLineRunner {
+
+	@Autowired
+	private EmployeeRepository repo;
+	
+	public void run(String... args) throws Exception {
+		Employee emp = new Employee();
+		emp.setEmpId(10);
+		emp.setEmpName("AA");
+		emp.setEmpSal(20.0);
+		
+		Set<String> empProjs = new HashSet<>();
+		empProjs.add("P1");
+		empProjs.add("P2");
+		empProjs.add("P3");
+		
+		emp.setEmpProjs(empProjs);
+		
+		List<String> empModules = new ArrayList<>();
+		empModules.add("MA");
+		empModules.add("MB");
+		empModules.add("MC");
+		
+		emp.setEmpModules(empModules);
+		
+		
+		Map<String,String> empClients = new HashMap<>();
+		empClients.put("C1", "NIT");
+		empClients.put("C2", "XYZ");
+		empClients.put("C3", "MNO");
+		
+		emp.setEmpClients(empClients);
+		
+		repo.save(emp);
+		
+	}
+
+}
+
+
+
+
+
+-------------------------------------------------------------------------
+mysql> use boot9am;
+Database changed
+mysql> show tables;
+Empty set (0.01 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_boot9am |
++-------------------+
+| emp_clients_tab   |
+| emp_mod_tab       |
+| emp_proj_tab      |
+| emptab            |
++-------------------+
+4 rows in set (0.01 sec)
+
+mysql> select * from emptab;
++-----+-------+------+
+| eid | ename | esal |
++-----+-------+------+
+|  10 | AA    |   20 |
++-----+-------+------+
+1 row in set (0.04 sec)
+
+mysql> select * from emp_proj_tab;
++-----+-------+
+| eid | eproj |
++-----+-------+
+|  10 | P1    |
+|  10 | P2    |
+|  10 | P3    |
++-----+-------+
+3 rows in set (0.00 sec)
+
+mysql> select * from  emp_mod_tab;
++-----+--------+----------+
+| eid | module | position |
++-----+--------+----------+
+|  10 | MA     |        0 |
+|  10 | MB     |        1 |
+|  10 | MC     |        2 |
++-----+--------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select * from  emp_clients_tab;
++-----+-------------+-------------+
+| eid | client_name | client_code |
++-----+-------------+-------------+
+|  10 | NIT         | C1          |
+|  10 | XYZ         | C2          |
+|  10 | MNO         | C3          |
++-----+-------------+-------------+
+3 rows in set (0.00 sec)
+
+
+==Note========================================================================
+*) @ElementCollection is must that creates collection table with columns
+  and maps with variable. if we did not specify this, exception is:
+
+MappingException: Could not determine type for: java.util.Set, ...
+
+*) @CollectionTable is optional.   if we did not specify this one,
+    then child table name is :
+           ClassName_CollectionvariableName (using camelCase to dash format/kebab case)
+
+ex:  class Employee {
+
+      Set<String> empProjs;
+      List<String> empModules;
+      Map<String,String> empClients;
+    }
+
+    Then child table:    employee_emp_projs , employee_emp_modules,
+    				employee_emp_clients
+
+
+
+*) If we did not specify @JoinColumn(name="") then 
+     ClassName_PKColumName
+ex:
+class Employee {
+	@Id
+	@Column(name="eid")
+	private Integer empId;
+}
+ex Fk Column name is :     employee_eid 
+
+
+*) if we did not specify Element Column (@Column(name="")
+   then default is : 
+      CollectionVariablename (in kebab case)
+       
+ex: class Employee {
+
+      Set<String> empProjs;
+      List<String> empModules;
+      Map<String,String> empClients;
+    }
+  ex:   emp_projs , emp_modules, emp_clients
+
+
+*) For a List Collection, Index numbers are generated from zero.
+  ex: 0,1,2,3....
+
+  These details can be stored inside a table (For collection mapping)
+  using @OrderColumn. It is optional to store, if you dont want to follow
+  index (Such concept is called as BAG in Hibernate).
+ 
+
+*) MapKeyColumn is created for sure. but giving/using annotation
+    @MapKeyColumn is optional.
+
+  Then Column name is: CollectionVariableName_key
+   ex : emp_clients_key
+==========================================================================
+CamelCase: empIdData
+Kebab case: emp_id_data (variable)| emp-id-data
+

@@ -1,0 +1,198 @@
+				Date : 26-Jul-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		------------------------------------------------
+			     Project Lombok API
+Lombok Video:
+https://www.youtube.com/watch?v=kSceQH4fFi4
+
+=> This is Open Souce java API, used to generate source code before compile
+=> Example: you can generate
+    default constructor
+    parameterized constructor
+    set and get methods
+    toString() method
+    equals() and hashCode() methods
+
+----pom.xml------------------------------------------------------------------
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+</dependency>
+
+S#1. Create Project
+> File > new > Spring Starter Project > Enter name and Package > next
+> Search and Select 'lombok' > Next > Finish.
+
+*) Note: Version is not required to specify. 
+           This is taken care by Spring Boot Parent Project.
+
+S#2 Define one class and apply Lombok annotations
+
+package in.nareshit.raghu.model;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+
+	
+}
+=====================================================================
+*) lombok annotations not generating code in Eclipse (or) STS?
+  Then follow below steps.
+
+(1) Close your STS/Eclipse
+(2) Goto Location
+   C:\Users\Raghu\.m2\repository\org\projectlombok\lombok\1.18.20
+(3) Double click on JAR : lombok-1.18.20.jar
+          (or)
+    > open cmd prompt
+    > cd C:\Users\Raghu\.m2\repository\org\projectlombok\lombok\1.18.20
+    > type   java -jar lombok-1.18.20.jar   and press enter
+  
+(4) Click on Specify Location and Choose STS/Eclipse location
+ Ex: D:/sts-4.10.0.RELEASE
+
+(5) Click on Install/Update 
+(6) Quit
+(7) now open your STS.
+(8) Remove and add Lombok annotations again
+
+====Lombok Annotation===================================================
+a) @NoArgsConstructor :
+  This annotation is used to generate Default/zero param constrcutor.
+
+--Ex---
+package in.nareshit.raghu.model;
+import lombok.NoArgsConstructor;
+@NoArgsConstructor
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+
+}
+--Generated code Looks----------
+package in.nareshit.raghu.model;
+public class Product {
+	private Integer pid;
+	private String pcode;
+        public Product() {
+	   super();
+	}
+}
+
+Q) Who will provide default const in java and when?
+A) Java Compiler given while compile. If class has no constrcutors.
+
+-------------------------------------------------------------------------
+(b) @AllArgsConstructor : It will generate all variables as Params constrcutor.
+
+--Ex code---
+package in.nareshit.raghu.model;
+import lombok.AllArgsConstructor;
+@AllArgsConstructor
+public class Product {
+	private Integer pid;
+	private String pcode;
+}
+---Generated Source code---
+package in.nareshit.raghu.model;
+public class Product {
+	private Integer pid;
+	private String pcode;
+	public Product(Integer pid,String pcode ) 
+	{
+	   super();
+	   this.pid = pid;
+	   this.pcode = pcode;
+	}
+}
+
+case## : if class has zero variable and applied @AllArgsConstructor
+         then it will generate default constrcutor.
+
+--code ---
+package in.nareshit.raghu.model;
+import lombok.AllArgsConstructor;
+@AllArgsConstructor
+public class Product {
+
+}
+----Generated Sourcode---
+package in.nareshit.raghu.model;
+public class Product {
+        public Product() {
+	   super();
+	}
+}
+
+
+====Example#2====================================================
+package in.nareshit.raghu.model;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+	
+}
+
+---Generated Source code-------------------
+package in.nareshit.raghu.model;
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+	
+	public Product() {
+	   super();
+	}
+	public Product(Integer pid,String pcode ) 
+	{
+	   super();
+	   this.pid = pid;
+	   this.pcode = pcode;
+	}
+}
+====*****Example#3====================================
+package in.nareshit.raghu.model;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product {
+
+}
+----Generated Source code-------------------------------
+Compiler Error : Duplicate method Product() in type Product
+package in.nareshit.raghu.model;
+public class Product {
+    public Product() {
+	   super();
+    }
+    public Product() {
+	   super();
+    }
+}

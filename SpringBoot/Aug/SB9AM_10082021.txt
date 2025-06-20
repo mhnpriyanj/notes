@@ -1,0 +1,126 @@
+			Date : 10/08/2021
+			Spring Boot 9AM
+			  Mr. RAGHU
+	-----------------------------------------------------
+		Profiles using Inputs (Properties/YAML)
+		---------------------------------------
+
+		Profiles using Coding (Logic) -- @Profile
+
+
+-> to execute class/code based on environment then use @Profile
+   on top of class.
+
+-> A class has no @Profile annotation, means execute logic in any
+  environment.
+
+Ex:
+a. SwaggerUi (RestWebservices Test Screen) -- @Profile({"default","qa"})
+b. RoleDataInsert(QA) --- @Profile("qa")
+c. GoogleMailservice ---- @Profile("prod")
+
+> @Profile can be placed at any class.
+> If current profile is matched with @Profile then code executed.
+
+> @Profile({ "P1","P2",....}) -- we can even provide multiple
+	profile names.
+--Note----------------------------------------------------------------
+a. A class has no @Profile annotation is executed in every env.
+b. No Active Profile name is set then default is active.
+c. A class having @Profile("default") -- means execute only in
+   Default Environment(Developer machine).
+
+d. Externally we can even pass --spring.profiles.active=default also
+   in this case 2 types of classes are executed.
+     I. class has @Profile("default")
+     II. class has no @Profile annotation.
+
+e. Fallback is applied for Input files, not for annotation
+   @Profile.
+--------------------------------------------------------------
+Input files working process and @Profile annotation working 
+process different.
+
+--Example code------------------
+@Component
+@Profile({"qa","prod"})
+public class RoleDataRunner implements CommandLineRunner {
+	
+	@Value("${my.app.title}")
+	private String title;
+
+	public void run(String... args) throws Exception {
+		System.out.println("ROLE DATA IS INSERTED.." + title);
+	}
+
+}
+
+Run Config:  --spring.profiles.active=qa
+> first @Profile({"qa","prod"}) is matching with qa so RoleDataRunner
+  is about to execute.
+
+> 2nd Search for 'my.app.title' inside 
+   application-qa.properties (not found,then next)
+   application-qa.yml (not found,then next)
+   application.properties(not found,then next)
+   application.yml (not found,then next --exception)
+
+===========================================================
+*) We can even execute a logic using not Profile case also.
+  ex: Do not execute logic in QA profile.
+     @Profile("!qa") 
+----------------------------------------------------------
+
+---Example Test------------------------------------------
+1.
+class ExportExcelData {}
+2.
+@Profile("!prod")
+class ExportPdfData {} 
+3.
+@Profile({"qa","default"})
+class ExportXmlData {}
+4.
+@Profile({"prod","qa"})
+class ExportJsonData {}
+5.
+@Profile({"default"})
+class ExportHtmlData {}
+
+
+Q1) --spring.profiles.active=qa Then which classes are executed?
+A) 1, 2, 3, 4
+
+Q2) --spring.profiles.active=prod,default Then which classes are executed?
+A) 1,2,3,4,5
+
+
+Q3) @Value("${my.app.title}")
+   and --spring.profiles.active=qa 
+   provide Input file names in order to search for key?
+
+A) 
+  1. application-qa.properties
+  2. application-qa.yml
+  3. application.properties
+  4. application.yml
+
+Q4) @Value("${my.app.title}")
+   and --spring.profiles.active=uat,prod 
+   provide Input file names in order to search for key?
+A)
+   1. application-prod.properties 
+   2. application-uat.properties
+   3. application-prod.yml        
+   4. application-uat.yml
+   5. application.properties
+   6. application.yml
+----------------------------------------------------------------
+--spring.profiles.active=a,b,c,d
+
+first a.prop loaded   id=10
+      b.prop loaded   id=20 (overriden)
+      c.prop loaded
+      d.prop loaded
+=====================================================
+

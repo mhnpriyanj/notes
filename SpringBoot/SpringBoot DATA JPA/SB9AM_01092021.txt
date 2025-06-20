@@ -1,0 +1,191 @@
+				Date : 01-09-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+	-----------------------------------------------------------------
+		Spring Boot Data JPA - Pagination and Sorting
+
+=> PagingAndSortingRepository(I) is given by Spring Data JPA.
+=> This is sub type of CrudRepository.
+=> This interface additionally provides 2 methods
+
+  Iterable<T> findAll(Sort sort);
+
+  Page<T> findAll(Pageable pageable);
+
+--Sorting-----------------------------
+select * from  booktab order by bcost asc;
+select * from  booktab order by bcost desc;
+
+select * from  booktab order by bcost asc,bname asc;
+select * from  booktab order by bcost desc,bname desc;
+
+select * from  booktab order by bcost asc, bname desc;
+select * from  booktab order by bcost desc, bname asc;
+----------------------------------------
+
+=> This Sorting is done at Database side, not using Java Comparator/Comparable.
+=> SQL query is generated using order by (ASC/DESC) concept.
+
+--API-----------------------
+class Sort {
+
+   static Sort by(String... variable) { ___ } //ASC
+   
+
+   static enum Direction { ASC, DESC }
+
+   static Sort by(Direction direction, String... variables) { ___ }
+
+
+   static class Order {
+       
+       static Order asc(String variable) { //ASC + variable }
+
+       static Order desc(String variable) { //DESC + variable }
+   
+   }
+
+   static Sort by(Order... orders) { ___ }
+}
+
+
+---code----------------------------------------
+name : SpringBoot2DataJpaSortAndPageEx
+dep  : Lombok, Data Jpa, MySQL
+
+1. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+
+2. Entity class
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="booktab")
+public class Book {
+	@Id
+	@Column(name="bid")
+	private Integer bookId;
+	@Column(name="bname")
+	private String bookName;
+	@Column(name="bcost")
+	private Double bookCost;
+}
+
+3. Repository interface
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+import in.nareshit.raghu.entity.Book;
+
+public interface BookRepository extends PagingAndSortingRepository<Book, Integer>{
+
+}
+
+4. Runner#1 for insert
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Book;
+import in.nareshit.raghu.repo.BookRepository;
+
+@Component
+public class BookDataInsertRunner implements CommandLineRunner {
+
+	@Autowired
+	private BookRepository repo;
+	
+	public void run(String... args) throws Exception {
+		repo.save(new Book(10, "Core Java", 200.0));
+		repo.save(new Book(11, "Adv Java", 500.0));
+		repo.save(new Book(12, "Boot", 500.0));
+		repo.save(new Book(13, "Microservices", 500.0));
+		repo.save(new Book(14, "Angular", 500.0));
+		repo.save(new Book(15, "ReactJS", 150.0));
+		repo.save(new Book(16, "HTML/CSS", 50.0));
+	}
+
+}
+
+5. Runner#2 for Sorting Example
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.repo.BookRepository;
+
+@Component
+public class BookSortRunner implements CommandLineRunner {
+
+	@Autowired
+	private BookRepository repo;
+	
+	public void run(String... args) throws Exception {
+		//case#1 sort using single field
+		
+		//SQL: select * from  booktab order by bcost asc;
+		/*Sort s1 = Sort.by("bookCost");
+		Sort s1 = Sort.by(Direction.ASC,"bookCost");
+		repo.findAll(s1).forEach(System.out::println);
+		 */
+		
+		//SQL: select * from  booktab order by bcost desc;
+	 	/*Sort s2 = Sort.by(Direction.DESC,"bookCost");
+		repo.findAll(s2).forEach(System.out::println);
+		*/
+		
+		//case#2 sort using multiple field
+		//SQL: select * from  booktab order by bcost asc,bname asc;
+		//Sort s3 = Sort.by("bookCost","bookName"); //ASC
+		/*Sort s3 = Sort.by(Direction.ASC,"bookCost","bookName"); //ASC
+		repo.findAll(s3).forEach(System.out::println);*/
+		
+		//SQL: select * from  booktab order by bcost desc,bname desc;
+		/*Sort s4 = Sort.by(Direction.DESC,"bookCost","bookName"); //ASC
+		repo.findAll(s4).forEach(System.out::println);
+		*/
+		
+		//case#3 sort using multiple field with mixing types
+		//SQL: select * from  booktab order by bcost asc, bname desc;
+		/*Sort s5 = Sort.by(Order.asc("bookCost"),Order.desc("bookName"));
+		repo.findAll(s5).forEach(System.out::println);*/
+		
+		//SQL: select * from  booktab order by bcost desc, bname asc;
+		Sort s5 = Sort.by(Order.desc("bookCost"),Order.asc("bookName"));
+		repo.findAll(s5).forEach(System.out::println);
+	}
+}
+
+====================================================================
+

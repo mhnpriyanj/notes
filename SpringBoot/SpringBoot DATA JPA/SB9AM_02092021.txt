@@ -1,0 +1,234 @@
+				Date : 02-09-2021
+				Spring Boot 9AM
+				  Mr. RAGHU
+		---------------------------------------------------
+			Spring Data JPA - Pagination
+
+*) Some times database table contains few rows , fetching all rows
+   to client device (browser) may not effect much.
+
+ex: Table--->10 rows
+SQL> SELECT * FROM EMPTAB;
+
+*) In few cases database table contains so many rows, if we fetch all rows
+  client device may not response/crash/stop/not working..
+  [it is not even better approch]
+
+ex: Table--->100000 rows
+SQL> SELECT * FROM purchases;
+
+Solution : Pagination.
+   Fetching data page by page to client device is called pagination.
+
+   Page - some set of rows selected, based on page size and page number given.
+
+*) Example For Pagination : google search
+=================================================================
+findAll() : this method is used to fetch all rows from DB table,
+		not supporting pagination.
+
+findAll(Pageable ): Page<T>
+  This method is used to fetch DB table data using pagination input 
+  Pageable(PageNumber, Page size).
+
+  Returns one Page (Content + meta-data) based on given inputs.
+
+*) Pageable(I), Impl class is PageRequest(C).
+
+   PageRequest(C) having static method of(pageNum,pageSize)
+   returns same PageRequest(C) object.
+
+ +--------------------------------------------+
+ |  Pageable pageable = PageRequest.of(0,3);  |
+ +--------------------------------------------+
+
+SQL> select * from <tablename> limit startingRowId,maxRowsCount;
+SQL> select * from booktab limit 2,5;
+
+=====code======================================
+Name : Springboot2DataJpaPagination
+Dep  : Data JPA, Lombok, mysql
+
+a. application.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/boot9am
+    username: root
+    password: root
+    
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect  
+
+b. Entity
+package in.nareshit.raghu.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="booktab")
+public class Book {
+	@Id
+	@Column(name="bid")
+	private Integer bookId;
+	@Column(name="bname")
+	private String bookName;
+	@Column(name="bcost")
+	private Double bookCost;
+}
+
+
+c. Repository
+package in.nareshit.raghu.repo;
+
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+import in.nareshit.raghu.entity.Book;
+
+public interface BookRepository extends PagingAndSortingRepository<Book, Integer>{
+
+}
+
+
+d. Runner#1 for insert
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+
+import in.nareshit.raghu.entity.Book;
+import in.nareshit.raghu.repo.BookRepository;
+
+//@Component
+public class BookDataInsertRunner implements CommandLineRunner {
+
+	@Autowired
+	private BookRepository repo;
+	
+	public void run(String... args) throws Exception {
+		repo.save(new Book(10, "Core Java", 200.0));
+		repo.save(new Book(11, "Adv Java", 500.0));
+		repo.save(new Book(12, "Boot", 500.0));
+		repo.save(new Book(13, "Microservices", 500.0));
+		repo.save(new Book(14, "Angular", 500.0));
+		repo.save(new Book(15, "ReactJS", 150.0));
+		repo.save(new Book(16, "HTML/CSS", 50.0));
+	}
+
+}
+
+
+e. Runner#2 for storting
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
+
+import in.nareshit.raghu.repo.BookRepository;
+
+//@Component
+public class BookSortRunner implements CommandLineRunner {
+
+	@Autowired
+	private BookRepository repo;
+	
+	public void run(String... args) throws Exception {
+		//case#1 sort using single field
+		
+		//SQL: select * from  booktab order by bcost asc;
+		/*Sort s1 = Sort.by("bookCost");
+		Sort s1 = Sort.by(Direction.ASC,"bookCost");
+		repo.findAll(s1).forEach(System.out::println);
+		 */
+		
+		//SQL: select * from  booktab order by bcost desc;
+	 	/*Sort s2 = Sort.by(Direction.DESC,"bookCost");
+		repo.findAll(s2).forEach(System.out::println);
+		*/
+		
+		//case#2 sort using multiple field
+		//SQL: select * from  booktab order by bcost asc,bname asc;
+		//Sort s3 = Sort.by("bookCost","bookName"); //ASC
+		/*Sort s3 = Sort.by(Direction.ASC,"bookCost","bookName"); //ASC
+		repo.findAll(s3).forEach(System.out::println);*/
+		
+		//SQL: select * from  booktab order by bcost desc,bname desc;
+		/*Sort s4 = Sort.by(Direction.DESC,"bookCost","bookName"); //ASC
+		repo.findAll(s4).forEach(System.out::println);
+		*/
+		
+		//case#3 sort using multiple field with mixing types
+		//SQL: select * from  booktab order by bcost asc, bname desc;
+		/*Sort s5 = Sort.by(Order.asc("bookCost"),Order.desc("bookName"));
+		repo.findAll(s5).forEach(System.out::println);*/
+		
+		//SQL: select * from  booktab order by bcost desc, bname asc;
+		Sort s5 = Sort.by(Order.desc("bookCost"),Order.asc("bookName"));
+		repo.findAll(s5).forEach(System.out::println);
+	}
+}
+
+
+f. Runner#3 for pagination
+package in.nareshit.raghu.runner;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.entity.Book;
+import in.nareshit.raghu.repo.BookRepository;
+
+@Component
+public class BookPageRunner implements CommandLineRunner {
+
+	@Autowired
+	private BookRepository repo;
+	
+	public void run(String... args) throws Exception {
+		//Pagination input (number,size)
+		Pageable pageable = PageRequest.of(0, 3);
+		
+		//execute
+		Page<Book> page = repo.findAll(pageable);
+		
+		//print data
+		if(page.hasContent()) {
+			List<Book> list = page.getContent();
+			list.forEach(System.out::println);
+		} else {
+			System.out.println("Given page not exist");
+		}
+		//---------------meta data-------------
+		System.out.println("HAVIG DATA? " + page.hasContent());
+		System.out.println("IS EMPTY? " + page.isEmpty());
+		System.out.println("IS FIRST? " + page.isFirst());
+		System.out.println("IS LAST? " + page.isLast());
+		System.out.println("HAS NEXT? " + page.hasNext());
+		System.out.println("HAS PREVIOUS? " + page.hasPrevious());
+		System.out.println("TOTAL PAGES? " + page.getTotalPages());
+		System.out.println("TOTAL ROWS? " + page.getTotalElements());
+		System.out.println("CURRENT PAGE NUMBER? " + page.getNumber()); 
+	}
+
+}

@@ -1,0 +1,204 @@
+				Date : 05-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		-----------------------------------------------
+
+--Video Task-------------------------------
+https://www.youtube.com/watch?v=8P5x4DH2WHA
+
+			  YAML -- using Spring Boot
+
+*) List/Set/Array Format:- (java.util)
+Properties Syntax:
+prefix.variable[index]=value
+
+YAML Syntax:  (use symbol dash inplace of index)
+ prefix:
+    variable:
+     - val1
+     - val2
+     - val3
+
+*) Map/Properties:- (java.util)
+Properties Syntax:
+prefix.variable.mapKey=mapValue
+
+YAML Syntax:
+prefix:
+  variable:
+    mapKey:<space>mapValue
+
+*) ClassType :-
+Properties Syntax:
+prefix.hasAvariable.variable=value
+
+YAML Syntax:
+prefix:
+  hasAVariable:
+      variable:<space>value
+
+=============================================================================
+(Auto-detect programmer defined keys)
+When using @ConfigurationProperties it is recommended to 
+add 'spring-boot-configuration-processor' to your classpath
+to generate configuration metadata
+
+> add in pom.xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-configuration-processor</artifactId>
+	<optional>true</optional>
+</dependency>
+
+*) It supports auto-detection of programmer defined keys in application.yml file
+  [it is optional to add]
+
+
+*) ctrl+shift+R   : to open your files
+*) ctrl+shift+T   : to open pre-defined files
+*) ctrl+F11       : To run main class
+
+ ===========================================================================
+ Name : SpringBoot2ConfigPropsYamlEx
+ Dep  : Lombok
+
+ 1. Bean class
+ package in.nareshit.raghu.bean;
+
+import lombok.Data;
+
+@Data
+public class ModelInfo {
+
+	private String name;
+	private String code;
+	private Integer qty;
+}
+--------
+package in.nareshit.raghu.bean;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+@Data
+@Component
+@ConfigurationProperties(prefix = "my.app")
+public class Product {
+
+	private Integer pid;
+	private String pcode;
+	private Double pcost;
+	
+	private List<String> colors;
+	//private Set<String> colors;
+	//private String[] colors;
+	
+	private Map<String,String> vendors;
+	
+	private ModelInfo mob; //HAS-A
+	
+}
+
+
+2. application.yml
+my:
+  app:
+    pid: 101
+    pcode: PEN
+    pcost: 200.0
+    colors:
+    - RED
+    - BLUE
+    - YELLOW
+    - WHITE
+    vendors:
+      V1: NIT
+      V2: XYZ
+    mob:
+      name: TS-88
+      code: XTZYA
+      qty: 12
+
+
+3. Main class
+package in.nareshit.raghu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class SpringBoot2YamlWithConfigPropsExApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext ac = SpringApplication.run(SpringBoot2YamlWithConfigPropsExApplication.class, args);
+		Object ob = ac.getBean("product");
+		System.out.println(ob);
+	}
+
+}
+
+*) @ConfigurationProperties will never throw any error/exception
+  if data is not present, provides default values.
+
+
+---application.properties----------
+my.app.pid=101
+my.app.pcode=ABCD
+my.app.pcost=501.5
+my.app.colors[0]=RED
+my.app.colors[1]=PINK
+my.app.colors[2]=YELLOW
+my.app.vendors.VA=AA
+my.app.vendors.VB=BB
+my.app.mob.name=TEST
+my.app.mob.code=ONE
+my.app.mob.qty=600
+------------------------------------
+
+>> Right click on above file name > Convert Properties to YAML File > Finish/OK
+
+--output----------------------------------------------------------------------------
+my:
+  app:
+    colors:
+    - RED
+    - PINK
+    - YELLOW
+    mob:
+      code: ONE
+      name: TEST
+      qty: 600
+    pcode: ABCD
+    pcost: 501.5
+    pid: 101
+    vendors:
+      VA: AA
+      VB: BB
+
+
+-----Task---------------------------------------------------------------
+Student(C)
+ sid
+ sname
+ sfee
+ marks(List<Double>)
+ grades(Map<String,String>)
+ address(HAS-A)
+
+Address
+  hno
+  location
+  pin
+
+*) Define above classes and pass data using
+ a. application.properties
+ b. application.yml
+
+*) Read data using @ConfigurationProperties
+

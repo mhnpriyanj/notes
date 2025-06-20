@@ -1,0 +1,243 @@
+		       Date : 8/9/2021
+		       Spring Boot 9AM 
+		          Mr. RAGHU
+		-----------------------------
+		   Spring Boot Profiles
+
+Environments: A location where our app is running. 
+   Developer
+   QA (Test)
+   UAT (User Acceptance Test)
+   Production 
+   ..etc
+   
+> Our code is same if we run our application at any Environment.
+  Only Properties data (key=values data) gets modified.
+
+Profiles:-
+*) Create and load environment based properties/YAML file.
+
+*)Syntax:
+   application-[profileName].properties
+ex:
+   application.properties         [default profile]
+   application-qa.properties      [qa profile]
+   application-prod.properties    [prod profile]
+
+*) To activate one profile, use option-args
+       --spring.profiles.active=prod
+
+------Example-----------------------------------------
+1. 
+Name : SpringBoot2ProfilesEx
+Dep  : Lombok
+
+2. Model class
+package in.nareshit.raghu.model;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+@Component
+@Data
+public class DbCon {
+
+	@Value("${my.driver}")
+	private String driver;
+	
+	@Value("${my.url}")
+	private String url;
+	
+}
+
+
+3. properties files
+
+--application.properties--
+my.driver=MySQL-Dev
+my.url=LOCAL-MYSQL
+
+
+--application-qa.properties--
+my.driver=Postgress-QA
+my.url=QA-PS
+
+
+--application-prod.properties--
+my.driver=Oracle-PROD
+my.url=PROD-ORCL
+
+
+
+4. Runner class
+package in.nareshit.raghu.runner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import in.nareshit.raghu.model.DbCon;
+
+@Component
+public class DataPrintRunner implements CommandLineRunner {
+	
+	@Autowired
+	private DbCon con;
+
+	public void run(String... args) throws Exception {
+		System.out.println(con);
+	}
+
+}
+
+
+5. Run Process
+> open main class > Right click > Run as > Run Configuration
+> Click on Arguments tab
+> Goto Option/program args
+> Enter data like
+   --spring.profiles.active=qa
+> Apply and Run button.
+
+====================================================
+6. Convert to jar
+> Right click on project > Run as > maven install
+> java -jar JarName.jar  --spring.profiles.active=qa
+
+7. Docker : images
+> docker run imagename --spring.profiles.active=qa
+---------------------------------------------------
+Q) Can we provide multiple profiles names to active?
+A) yes. in that case key=val if duplicated then
+   they are overriden with next level proeprties file
+
+   ex:
+    --spring.profiles.active=qa,prod
+
+    First 
+      application-qa.properties   file is loaded
+         a=10
+	 b=20
+	 c=30
+    Next
+      application-prod.properties   file is loaded
+        a=55  (overriden)
+	d=33
+	e=34
+
+
+Q) What is Profile fallback? How can we handle same value
+   keys for all profiles?
+A) 
+  Profile fallback : if current active profile is not having
+  		required key=val, then Spring Boot will
+		fetch data from default profile.
+
+ ex: search in application-qa.properties (not found)
+     search in application.properties (default)
+		  (or)
+  If 3 profiles qa,prod,uat are having key=val same.
+  ex: title=NIT, then do not define this key 3 times
+  Better define at application.properties (default) 
+  only once
+----------------------------------------------------   
+*** Always default profiles (properties) loaded first
+    at every/any profile activation.
+-----------------------------------------------------
+		YAML with Profiles
+
+*) we can define multiple YAML files for profiles concept
+  [not much used]
+
+ex:
+application.yml		[default]
+my:
+  driver: local-mysql
+  url: local-MS-URL
+  title: NIT
+
+
+application-qa.yml	[qa profile]
+my:
+  driver: QA-POSTGRESS
+  url: QA-URL
+  title: NIT-QA
+
+
+
+application-prod.yml	[prod profile]
+
+my:
+  driver: PROD-ORCL
+  url: PROD-URL
+  title: NIT-PROD
+
+*) Model and Runner are same as before
+
+
+---using profile separator(---) ----------------
+application.yml
+key: val
+---
+key: val
+spring:
+  profiles: <name>
+---
+key: val
+spring:
+  profiles: <name>
+
+
+ex: application.yml
+#Default profile
+my:
+  driver: local-mysql
+  url: local-MS-URL
+  title: NIT
+
+---  
+my:
+  driver: QA-POSTGRESS
+  url: QA-PS-URL
+  title: NIT-QA
+
+spring:
+  profiles: qa
+    
+---    
+my:
+  driver: PROD-ORCL
+  url: PROD-ORCL-URL
+  title: NIT-ORCL
+
+spring:
+  profiles: prod
+
+
+===================================================
+--spring.profiles.active=prod
+--spring.profiles.active=qa
+--spring.profiles.active=default (no need)
+
+Q) How can we activate one profile in Boot?
+A)
+  Spring boot 2.3.x 
+     spring:
+        profiles: qa
+
+  Spring boot 2.4.x  [current -- 2.5.x]
+     spring:
+        config:
+	   activate: 
+	      on-profile: qa
+
+ConfigDataEnvironment:
+ Property 'spring.profiles' imported from location 
+ 'class path resource [application.yml]' 
+ is invalid and should be replaced with 
+ 'spring.config.activate.on-profile' 
+ [origin: class path resource [application.yml] 
+=================================================
+@Profile:- 

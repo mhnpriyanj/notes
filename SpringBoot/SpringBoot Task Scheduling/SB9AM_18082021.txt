@@ -1,0 +1,126 @@
+				Date : 18-Aug-21
+				Spring Boot 9AM
+				  Mr. RAGHU
+		--------------------------------------------------
+Cron Refrence Notes:-
+https://spring.io/blog/2020/11/10/new-in-spring-5-3-improved-cron-expressions
+
+			  Spring Boot - Scheduling
+
+Scheduling:-
+   Executing a task/method in a loop
+   based on period of time or point of time.
+
+Examples:-
+a. Bank account statement (Every for month)
+b. CC Bill Statement 
+c. Weekly/Monthly/3months Reports
+d. EMI Reminder
+f. Birthday Messages
+g. Tax Payment
+h. Electricity Bill Payment
+i. Server reports/Log files/Billing
+...etc
+
+
+> period of time  : Time gap
+4 hrs,
+2 mins
+5 days,
+6 years
+
+> point of time : Exact start date/time
+1st Jan- 9AM
+31st Dec-6PM
+..etc
+=============================================================================
+*) Scheduling process in application can be enabled/disabled using
+   @EnableScheduling (by default it is disabled)
+
+*) Define a method with logic using below syntax
+    public void <methodName>() { //body }
+
+   This method is called in a loop by Container
+
+*) On top of method must provide @Scheduled using fixedDelay/fixedRate/cron**
+*) We can autowire some other objects, make DB calls inside method.
+=========================================================================
+Q) Is a method execution time same for multiple calls/executions?
+A) May not be. Some times it might be same, but mostly it is not.
+
+1000 Millsec = 1 sec
+_________________________________________________________________
+|                          fixedDelay                           |   
++---------------------------------------------------------------+
+
+fixedDelay : fixed Waiting time between last method call execution finish time
+     	        to next method call start time.
+
+
+wait time is given/used b/w last method call finish--next method call start.
+
+Name: SpringBoot2SchedulingEx
+
+> At main class : @EnableScheduling
+
+> Report class
+package in.nareshit.raghu;
+
+import java.util.Date;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ReportService {
+	
+	int count =1;
+
+	@Scheduled(fixedDelay = 10000)
+	public void showReport() {
+		System.out.println("START # " + count +"-" + new Date());
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("END # " + count++ +"-" + new Date());
+	}
+}
+*) In above example, let method execution time can be 5sec, 8sec, 35 sec..etc
+   But waiting time is fixed ie 10sec.
+
+*) Scheduling is auto-controlled process by Container.
+  On App startup this is started, when app/server is down this is stopped.
+=============================================================================
+fixedRate :-
+      The max waiting time including method execution time.
+
+fixedRate = Wait time - Method Execution time  
+
+> if the value is -ve/zero then wait time is ZERO(0)
+
+package in.nareshit.raghu;
+
+import java.util.Date;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ReportService {
+	
+	int count =1;
+
+	@Scheduled(fixedRate = 5000)
+	public void showReport() {
+		System.out.println("START # " + count +"-" + new Date());
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("END # " + count++ +"-" + new Date());
+	}
+}
+=============================================================================
