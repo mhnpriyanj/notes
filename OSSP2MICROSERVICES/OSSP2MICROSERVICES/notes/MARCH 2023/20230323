@@ -1,0 +1,77 @@
+SAGA design pattern
+Each Service has its own database (when we use Database per Service. But few business transactions spans multiple services, so we need to apply transactionality across these services, how can we implement transactionality across these services of separate databases?
+																	 
+#1 Global Transactions or Distributed Transactions or 2-Phase Commit
+We can achieve transactionality across the databases by applying distributed transactions (or 2 Phase Commit), where all the databases or resources participates within one single transaction. So all the participating resources within the transaction either will be commited or rolledback at one shot.
+But there are problems in using 2pc transactionality
+problems:
+1. with 2-phase commit transactionality we cannot achieve higher concurrency levels in handling requests and there is no use of scalability.
+In Microservices applications we can achieve highest level of scalability by running multiple instances of the services, all of these microservices performs the operation on the underlying database. if we implement 2pc transaction, then aspart of one request processing a thread of execution might have locked the underlying database records/table waiting for another resource to commit the changes, during this point of time, all the requests across the instances of the microservice has to wait for the transaction to be completed, there by which we cannot achieve highest concurrency levels in handling the requests.
+From the above we can say 2pc is an anti-pattern in microservices
+
+2. 2pc transaction may not be feasible to be implemented always, because in Database per service pattern each microservice might have its own database where one service might use SQL and others might use NO-SQL, in such case we cannot implement 2pc transactionality as every resource doesnt support global transactions
+
+Then how to achieve transactionality across the microservices?
+To help us in implementing transactionality across the services the SAGA design pattern has been introduced.
+SAGA:
+implement each business transaction that spans multiple services as a saga. A saga means sequence of local transactions. Each local transaction updates the database and publishes a message or event to trigger the next local transaction in the saga
+
+if a local transaction has been failed because it violates a business rule then saga executes a series of compensating transactions that undo the changes that were made by the preceding local transactions
+
+1 business transaction
+ -> service1
+ -> service2
+ 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+																	 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+																	 

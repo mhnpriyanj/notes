@@ -1,0 +1,7 @@
+Command Query Responsibility Segregation (CQRS)
+If we are building the Microservice application based on Database per service pattern, we will not be able to implement querying the data and joining the data from multiple services directly.
+	
+How to implement a query that retrieves the data from multiple services and join them together?
+we have 2 patterns for it
+1. API Composer
+2. CQRS

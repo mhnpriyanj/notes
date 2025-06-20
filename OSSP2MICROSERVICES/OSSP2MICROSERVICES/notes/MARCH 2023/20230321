@@ -1,0 +1,138 @@
+Decompose Patterns
+There are 4 patterns are available based on which we can decompose an enterprise application into Microservices
+1. Decompose based on business capabilities
+2. Decompose based on sub-domain
+3. Self Contained Service
+4. Service Per Team
+-----------------------------------------------------------------------------------------------------------------------------------
+Data Management
+1. Database per Service
+2. Shared Database
+
+1. Database per service
+per each service create an seperate schema/database to achieve highest-level decompling between the services. if all the Microservices of our system is using a single database schema as a datastore, if one of the Microservice has changed the database table then it effects all the other microservices, since everyone using the same schema.
+	
+to ensure all the microservices of our system are completely loosely coupled, use separate schema/database per each service. since the services has their own schema if one service requires the data that is managed by another service, the services has to communicate over api calls only.
+	
+drawbacks:
+1. since each service has to make an api call in using the data of the other service, it results in huge network calls and impacts the performance of the system
+2. since each microservice has its own database, if there is an business operation that spans across the microservices achieving the transactionality is very complex. one way to achieve transactionality is by using 2pc (phase commit) (distributed transactions), but we should avoid using 2pc in microservice applications since it affects the scalability of the application. there are alternate mechanism in achieve transactionality across the microservices services like saga but often complex to implement.
+3. implementing queries that join the data from multiple databases is challenging
+4. since each microservice has its own schema/database, few might use SQL and other services might use No-Sql working in combination of these databases would be very complex
+
+advantages:
+1. each microservice is completely loosely coupled from other service, since the services doesnt have any impact on another if there is a change in database
+2. each service can use the type of database that best suite for their needs
+
+2. Shared Database
+all the microservice applications that are part of the system uses one single database schema/database only. 
+
+advantages:-
+1. we can use straight forward database transactions for achieving consistency
+2. A single database is easy to operate
+3. achieving data consistency through database constraints is easy
+
+drawbacks:-
+1. development time coupling = A developer working on one service needs to cooridnate with another developer working on schema changes for the other microservice. This coupling requires additional coordination across the teams thus slows down the development
+2. Runtime coupling - because all the services are using the same schema or database, one service transaction might interfere the other service transaction locking the tables and making the other services wait
+----------------------------------------------------------------------------------------------------------------------------------
+Data Management and access pattern
+1. API Composer
+In case of service per database pattern, we create one database/schema per one service so that the data would be scattered acros the microservices, due to this there is no way to gather or implement joins in quering the data from multiple services
+
+To overcome the above problem, use API Composer. An Api Composer is an query service that invokes multiple other services that own the data and performs an in-memory join of the results
+Usually the API Composer is implemented as part of API Gateway
+
+advantages:-
+1. Through Api Compose we can aggregate the data across the microservices
+
+dis-advantage:
+1. since the data sets data are joined within the memory, it leads to increased memory usage and might run into memory issues as well.
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
